@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Unión — Gestión</title>
+<link rel="icon" href="images/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0}
+  .gscroll::-webkit-scrollbar{width:9px;height:9px}
+  .gscroll::-webkit-scrollbar-thumb{background:#d6d4ce;border-radius:8px}
+  .gscroll::-webkit-scrollbar-track{background:transparent}
+  @keyframes gpop{0%{opacity:0;transform:scale(.96)}100%{opacity:1;transform:scale(1)}}
+  @keyframes gtoast{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+  [data-nav]:hover{background:#F5F4F1}
+  .backlink{position:fixed;bottom:18px;left:18px;z-index:80;display:flex;align-items:center;gap:7px;background:#17181C;color:#fff;font-family:Figtree,sans-serif;font-weight:700;font-size:13px;text-decoration:none;padding:9px 15px;border-radius:999px;box-shadow:0 8px 24px rgba(23,24,28,.25)}
+  @media(max-width:780px){#sidebar{display:none!important}}
+</style>
+</head>
+<body>
+<a class="backlink" href="index.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"/></svg> Inicio</a>
+<div style="display:flex;height:100vh;width:100%;background:#F5F4F1;font-family:Figtree,system-ui,sans-serif;color:#17181C;overflow:hidden">
+  <div id="sidebar" style="width:236px;flex:none;background:#fff;border-right:1px solid #E6E3DD;display:flex;flex-direction:column;height:100%">
+    <div style="padding:20px 20px 16px;display:flex;align-items:center;gap:10px">
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:24px;letter-spacing:-.02em">la <span style="color:#E0202E">unión</span></div>
+      <span style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#9A9DA4;border:1px solid #E6E3DD;padding:2px 6px;border-radius:6px;margin-top:2px">GESTIÓN</span>
+    </div>
+    <div class="gscroll" id="nav" style="flex:1;overflow-y:auto;padding:6px 12px 12px"></div>
+    <div style="padding:10px 12px 12px;border-top:1px solid #E6E3DD">
+      <div style="display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:10px"><div style="width:34px;height:34px;border-radius:50%;background:#17181C;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13px;flex:none">RA</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Roberto Adet</div><div style="font-size:11.5px;color:#9A9DA4">Dueño · Las Lajitas</div></div></div>
+    </div>
+  </div>
+  <div class="gscroll" id="main" style="flex:1;height:100%;overflow-y:auto;position:relative"></div>
+</div>
+
+<script>
+"use strict";
+const G={
+  state:{mod:'dashboard',toast:null},
+  CATS:[
+    {id:'frutas',name:'Frutas y Verduras',color:'#2E9E5B',soft:'#EAF5EE'},
+    {id:'lacteos',name:'Lácteos',color:'#2D7FF0',soft:'#E9F1FE'},
+    {id:'carnes',name:'Carnes',color:'#D9434E',soft:'#FBECEE'},
+    {id:'almacen',name:'Almacén',color:'#C98A2B',soft:'#F8F0E2'},
+    {id:'bebidas',name:'Bebidas',color:'#1FA6A6',soft:'#E5F4F4'},
+    {id:'limpieza',name:'Limpieza',color:'#6F6FE0',soft:'#EDEDFB'},
+    {id:'panaderia',name:'Panadería',color:'#C46A2B',soft:'#F5ECE3'},
+    {id:'congelados',name:'Congelados',color:'#3FA9D6',soft:'#E6F3FA'}
+  ],
+  svg(size,color,sw,paths){ return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="'+(sw||1.85)+'" stroke-linecap="round" stroke-linejoin="round">'+paths.map(d=>'<path d="'+d+'"/>').join('')+'</svg>'; },
+  catIcon(id,size){
+    const c=this.CATS.find(x=>x.id===id); const col=c?c.color:'#696D77';
+    const P={frutas:['M12 8.2c-2.3-3-7.2-1.6-7.2 3.3 0 4.8 3.5 8.5 7.2 8.5s7.2-3.7 7.2-8.5c0-4.9-4.9-6.3-7.2-3.3z','M12 8.2c.2-2.3 1.7-3.5 3.6-3.9'],lacteos:['M9 8.5 10 4h4l1 4.5V20H9z','M9 8.5h6','M11 12h2'],carnes:['M5.6 12.6a6.4 5.4 0 0 1 12.8 0 4.1 4.1 0 0 1-8.2 1.6 3 3 0 0 1-4.6-1.6z','M16.2 7.6 19 5.2'],almacen:['M6.6 6.2h10.8V19a1 1 0 0 1-1 1H7.6a1 1 0 0 1-1-1z','M6.6 10h10.8','M9.6 4h4.8l1 2.2H8.6z'],bebidas:['M7.6 8h8.8l-1 11a1 1 0 0 1-1 1h-4.8a1 1 0 0 1-1-1z','M9.6 4.6h4.8','M9.2 8 8.2 5'],limpieza:['M9 9h5v11H9z','M14 6.6l3.6-1.1','M9 9V6h4v3','M14 8.6l3.6-1.1'],panaderia:['M5 13.6a4 4 0 0 1 4-4h6a4 4 0 0 1 0 8H9a4 4 0 0 1-4-4z','M9.6 11.2v4.6','M13 11.2v4.6'],congelados:['M12 3.2v17.6','M4 7.6 20 16.4','M20 7.6 4 16.4','M12 3.2 9.8 5.8','M12 3.2l2.2 2.6','M12 20.8l-2.2-2.6','M12 20.8l2.2-2.6']};
+    return this.svg(size,col,1.85,(P[id]||['M4 12h16']));
+  },
+  ui(name,size,color,sw){
+    const col=color||'#17181C';
+    const M={
+      grid:['M4 4h7v7H4z','M13 4h7v7h-7z','M4 13h7v7H4z','M13 13h7v7h-7z'],
+      pos:['M3 6.5h18a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z','M3 10h18','M6 14h4'],
+      qr:['M4 4h6v6H4z','M14 4h6v6h-6z','M4 14h6v6H4z','M14 14h2v2h-2z','M18 14h2v2h-2z','M14 18h2v2h-2z','M18 18h2v2h-2z'],
+      box:['M21 8.5 12 3 3 8.5v7L12 21l9-5.5z','M3 8.5 12 14l9-5.5','M12 14v7'],
+      stack:['M12 3 3 7.5 12 12l9-4.5z','M3 12 12 16.5 21 12','M3 16.5 12 21 21 16.5'],
+      truck:['M3 6.5h11v9H3z','M14 9.5h4l3 3v3h-7z','M7 18.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z','M17.5 18.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4z'],
+      users:['M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z','M3 20c0-3.3 2.7-5 6-5s6 1.7 6 5','M16 4.2a3.5 3.5 0 0 1 0 6.6','M18 15.2c2 .6 3.5 2 3.5 4.8'],
+      chart:['M4 19V9','M9 19V5','M14 19v-8','M19 19V7','M3 19.5h18'],
+      card:['M3 6.5h18a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z','M2 10h20','M6 14.5h4'],
+      gear:['M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z','M19.4 13.5a1.6 1.6 0 0 0 .3 1.8l.05.05a2 2 0 1 1-2.8 2.8l-.05-.05a1.6 1.6 0 0 0-2.7 1.1V20a2 2 0 0 1-4 0v-.1a1.6 1.6 0 0 0-2.7-1.1l-.05.05a2 2 0 1 1-2.8-2.8l.05-.05A1.6 1.6 0 0 0 4.6 13.5H4.5a2 2 0 0 1 0-4h.1a1.6 1.6 0 0 0 1.1-2.7l-.05-.05a2 2 0 1 1 2.8-2.8l.05.05a1.6 1.6 0 0 0 2.7-1.1V2.5a2 2 0 0 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.05-.05a2 2 0 1 1 2.8 2.8l-.05.05a1.6 1.6 0 0 0-1.1 2.7h.1a2 2 0 0 1 0 4z'],
+      dollar:['M12 3v18','M16.5 7.5c0-2-2-3-4.5-3s-4.5 1-4.5 3 2 2.7 4.5 3 4.5 1.3 4.5 3.2-2 3-4.5 3-4.5-1-4.5-3'],
+      receipt:['M5 3.5h14v17l-2.5-1.5L14 20.5 12 19l-2 1.5-2.5-1.5L5 20.5z','M8.5 8h7','M8.5 12h7'],
+      bag:['M6 8h12l-1 12a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1z','M9 8V6a3 3 0 0 1 6 0v2'],
+      pin:['M12 21s6.8-6.2 6.8-11A6.8 6.8 0 1 0 5.2 10c0 4.8 6.8 11 6.8 11z','M12 7.6a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8z']
+    };
+    return this.svg(size,col,sw||1.9,(M[name]||[]));
+  },
+  toastMsg(m){ if(this._t)clearTimeout(this._t); this.state.toast=m; this.renderToast(); this._t=setTimeout(()=>{this.state.toast=null;this.renderToast();},1900); },
+  go(id){ if(id==='pos'){ window.location.href='pos.html'; return; } this.state.mod=id; this.render(); if(id!=='dashboard'){ this.toastMsg(this.modName(id)+' — módulo de demostración'); } },
+  modName(id){ return ({dashboard:'Dashboard',pos:'Caja',cobros:'Cobros web',catalogo:'Catálogo',inventario:'Inventario',compras:'Compras',clientes:'Clientes',finanzas:'Finanzas',empleados:'Empleados',configuracion:'Configuración'})[id]||id; },
+
+  renderNav(){
+    const groups=[
+      {label:'OPERACIÓN',items:[['dashboard','Dashboard','grid',0],['pos','Caja','pos',0],['cobros','Cobros web','qr',0]]},
+      {label:'PRODUCTOS',items:[['catalogo','Catálogo','box',0],['inventario','Inventario','stack',4],['compras','Compras','truck',0]]},
+      {label:'NEGOCIO',items:[['clientes','Clientes','users',0],['finanzas','Finanzas','chart',0],['empleados','Empleados','card',0]]},
+      {label:'SISTEMA',items:[['configuracion','Configuración','gear',0]]}
+    ];
+    document.getElementById('nav').innerHTML=groups.map(g=>'<div style="margin-bottom:14px"><div style="font-size:10.5px;font-weight:700;letter-spacing:.1em;color:#9A9DA4;padding:6px 10px">'+g.label+'</div>'+
+      g.items.map(it=>{const[id,label,icon,badge]=it;const active=this.state.mod===id;
+        const badgeEl=badge?'<span style="background:#E0202E;color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px">'+badge+'</span>':'';
+        return '<div data-nav onclick="G.go(\''+id+'\')" style="display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:10px;cursor:pointer;margin-bottom:2px;background:'+(active?'#FBECEE':'transparent')+';color:'+(active?'#E0202E':'#17181C')+'"><span style="flex:none;display:flex">'+this.ui(icon,19,active?'#E0202E':'#696D77')+'</span><span style="font-size:13.5px;font-weight:'+(active?'700':'600')+';flex:1">'+label+'</span>'+badgeEl+'</div>';
+      }).join('')+'</div>').join('');
+  },
+
+  dashboard(){
+    const kpis=[
+      {label:'Ventas hoy',value:'$847.320',delta:'+12,4% vs ayer',dc:'#1B8A53',soft:'#EAF5EE',icon:this.ui('dollar',18,'#1B8A53')},
+      {label:'Tickets',value:'138',delta:'+9 vs ayer',dc:'#1B8A53',soft:'#E9F1FE',icon:this.ui('receipt',18,'#2D7FF0')},
+      {label:'Ticket promedio',value:'$6.140',delta:'+3,1%',dc:'#1B8A53',soft:'#F8F0E2',icon:this.ui('bag',18,'#C98A2B')},
+      {label:'Margen bruto',value:'28,6%',delta:'-0,8% vs ayer',dc:'#D12027',soft:'#FBECEE',icon:this.ui('chart',18,'#D9434E')}
+    ];
+    const cdata=[{day:'Lu',v:612},{day:'Ma',v:540},{day:'Mi',v:705},{day:'Ju',v:668},{day:'Vi',v:910},{day:'Sá',v:1180},{day:'Do',v:847}];
+    const cmax=Math.max(...cdata.map(d=>d.v));
+    const top=[{id:1,name:'Leche Entera La Serenísima',u:64},{id:19,name:'Coca-Cola Original',u:51},{id:6,name:'Banana Ecuador',u:47},{id:17,name:'Yerba Mate Playadito',u:39},{id:13,name:'Fideos Tirabuzón Matarazzo',u:33}];
+    const tmax=Math.max(...top.map(t=>t.u));
+    const low=[{cat:'almacen',name:'Café La Virginia',unit:'250 g',stock:0},{cat:'congelados',name:'Helado Crema Americana',unit:'1 kg',stock:2},{cat:'carnes',name:'Asado de Tira',unit:'Por kg',stock:4},{cat:'lacteos',name:'Manteca La Paulina',unit:'200 g',stock:6}];
+    const recent=[{id:'#1042',m:'Efectivo',cat:'almacen',items:7,total:'$8.940',time:'14:32'},{id:'#1041',m:'QR Mercado Pago',cat:'bebidas',items:3,total:'$5.770',time:'14:21'},{id:'#1040',m:'Tarjeta',cat:'carnes',items:5,total:'$23.110',time:'14:08'},{id:'#1039',m:'Efectivo',cat:'frutas',items:9,total:'$4.380',time:'13:54'},{id:'#1038',m:'QR Mercado Pago',cat:'lacteos',items:4,total:'$6.250',time:'13:40'}];
+    const payIcon=m=>m.indexOf('QR')>=0?'qr':m==='Tarjeta'?'card':'dollar';
+
+    const kpiHtml=kpis.map(k=>'<div style="background:#fff;border:1px solid #E6E3DD;border-radius:16px;padding:18px"><div style="display:flex;align-items:center;justify-content:space-between"><span style="font-size:13px;color:#696D77;font-weight:600">'+k.label+'</span><span style="width:32px;height:32px;border-radius:9px;background:'+k.soft+';display:flex;align-items:center;justify-content:center">'+k.icon+'</span></div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:28px;margin-top:12px">'+k.value+'</div><div style="font-size:12.5px;font-weight:600;color:'+k.dc+';margin-top:4px">'+k.delta+'</div></div>').join('');
+    const chartHtml=cdata.map((d,i)=>{const last=i===cdata.length-1;return '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;height:100%;justify-content:flex-end"><div style="font-size:11px;font-weight:700;color:#696D77;font-family:\'Space Grotesk\',sans-serif">$'+d.v+'k</div><div style="width:100%;max-width:42px;border-radius:8px 8px 4px 4px;background:'+(last?'#E0202E':'#F2C0C4')+';height:'+Math.round(d.v/cmax*140)+'px"></div><div style="font-size:11.5px;color:#9A9DA4;font-weight:600">'+d.day+'</div></div>';}).join('');
+    const topHtml=top.map(t=>'<div><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">'+t.name+'</span><span style="font-size:12.5px;color:#696D77;font-family:\'Space Grotesk\',sans-serif;font-weight:700">'+t.u+'u</span></div><div style="height:7px;background:#F0EEEA;border-radius:4px;overflow:hidden"><div style="height:100%;width:'+Math.round(t.u/tmax*100)+'%;background:#E0202E;border-radius:4px"></div></div></div>').join('');
+    const lowHtml=low.map((p,i)=>{const c=this.CATS.find(x=>x.id===p.cat);const col=p.stock===0?'#D12027':'#E08600';return '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-top:'+(i===0?'none':'1px solid #F0EEEA')+'"><div style="width:34px;height:34px;border-radius:9px;background:'+c.soft+';display:flex;align-items:center;justify-content:center;flex:none"><div style="transform:scale(.62)">'+this.catIcon(p.cat,40)+'</div></div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.name+'</div><div style="font-size:11.5px;color:#696D77">'+p.unit+'</div></div><div style="text-align:right"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:14px;color:'+col+'">'+p.stock+'</div><div style="font-size:10.5px;color:#9A9DA4">en stock</div></div></div>';}).join('');
+    const recentHtml=recent.map((r,i)=>{const c=this.CATS.find(x=>x.id===r.cat);return '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-top:'+(i===0?'none':'1px solid #F0EEEA')+'"><div style="width:34px;height:34px;border-radius:9px;background:'+c.soft+';display:flex;align-items:center;justify-content:center;flex:none">'+this.ui(payIcon(r.m),16,c.color)+'</div><div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">'+r.id+'</div><div style="font-size:11.5px;color:#696D77">'+r.m+' · '+r.items+' ítems</div></div><div style="text-align:right"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:14px">'+r.total+'</div><div style="font-size:10.5px;color:#9A9DA4">'+r.time+'</div></div></div>';}).join('');
+
+    return '<div style="padding:26px 30px 60px;max-width:1180px">'+
+      '<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:22px"><div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px">Resumen del día</div><div style="font-size:13.5px;color:#696D77;margin-top:3px">Domingo 22 de junio · Sucursal Las Lajitas</div></div><div onclick="G.go(\'pos\')" style="cursor:pointer;display:flex;align-items:center;gap:8px;background:#E0202E;color:#fff;font-weight:700;font-size:14px;padding:11px 18px;border-radius:11px">'+this.ui('pos',18,'#fff')+' Abrir caja</div></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">'+kpiHtml+'</div>'+
+      '<div style="display:grid;grid-template-columns:1.5fr 1fr;gap:16px;margin-top:16px"><div style="background:#fff;border:1px solid #E6E3DD;border-radius:16px;padding:20px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:16px">Ventas últimos 7 días</div><div style="font-size:12.5px;color:#696D77">Total <span style="color:#17181C;font-weight:700;font-family:\'Space Grotesk\',sans-serif">$5,46M</span></div></div><div style="display:flex;align-items:flex-end;gap:14px;height:170px;padding-top:8px">'+chartHtml+'</div></div>'+
+        '<div style="background:#fff;border:1px solid #E6E3DD;border-radius:16px;padding:20px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:16px;margin-bottom:16px">Más vendidos hoy</div><div style="display:flex;flex-direction:column;gap:14px">'+topHtml+'</div></div></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px"><div style="background:#fff;border:1px solid #E6E3DD;border-radius:16px;padding:20px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:16px">Stock bajo</div><div onclick="G.go(\'inventario\')" style="cursor:pointer;font-size:12.5px;font-weight:700;color:#E0202E">Ver inventario</div></div><div style="display:flex;flex-direction:column;gap:1px">'+lowHtml+'</div></div>'+
+        '<div style="background:#fff;border:1px solid #E6E3DD;border-radius:16px;padding:20px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:16px;margin-bottom:14px">Últimas ventas</div><div style="display:flex;flex-direction:column;gap:1px">'+recentHtml+'</div></div></div>'+
+    '</div>';
+  },
+
+  placeholder(id){
+    return '<div style="padding:26px 30px;max-width:1180px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px;margin-bottom:6px">'+this.modName(id)+'</div><div style="font-size:13.5px;color:#696D77;margin-bottom:24px">Módulo del sistema de gestión</div><div style="background:#fff;border:1px dashed #D6D4CE;border-radius:18px;padding:70px 40px;text-align:center"><div style="width:64px;height:64px;border-radius:16px;background:#FBECEE;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">'+this.ui('gear',30,'#E0202E')+'</div><div style="font-size:17px;font-weight:700">Vista de demostración</div><div style="font-size:14px;color:#696D77;margin-top:8px;max-width:420px;margin-left:auto;margin-right:auto">Este módulo forma parte del diseño completo de La Unión Gestión. El <b>Dashboard</b> está implementado y navegable. Los demás módulos se desarrollan a pedido.</div><div onclick="G.go(\'dashboard\')" style="cursor:pointer;display:inline-block;margin-top:22px;background:#E0202E;color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:11px">Volver al dashboard</div></div></div>';
+  },
+
+  renderToast(){
+    let el=document.getElementById('gtoast');
+    if(this.state.toast){ if(!el){el=document.createElement('div');el.id='gtoast';document.body.appendChild(el);}
+      el.style.cssText='position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#17181C;color:#fff;font-size:14px;font-weight:600;padding:13px 22px;border-radius:999px;box-shadow:0 12px 36px rgba(0,0,0,.3);animation:gtoast .25s ease;white-space:nowrap;z-index:90';
+      el.textContent=this.state.toast;
+    } else if(el){ el.remove(); }
+  },
+  render(){
+    this.renderNav();
+    document.getElementById('main').innerHTML=this.state.mod==='dashboard'?this.dashboard():this.placeholder(this.state.mod);
+    document.getElementById('main').scrollTop=0;
+    this.renderToast();
+  }
+};
+G.render();
+</script>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Unión — Tienda Virtual</title>
+<meta name="description" content="La Unión — el super de tu barrio, ahora también en pantalla. Catálogo de productos, ofertas de la semana y Club La Unión.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0}
+  .mscroll::-webkit-scrollbar{height:8px;width:8px}
+  .mscroll::-webkit-scrollbar-thumb{background:#d6d4ce;border-radius:8px}
+  @keyframes dtoast-in{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+  button{font-family:inherit}
+  [data-hover-cat]:hover{border-color:#E0202E!important}
+  [data-hover-row]:hover{background:#F5F4F1!important}
+  .pcard:hover{box-shadow:0 8px 24px rgba(23,24,28,.12)}
+  .pcard{transition:box-shadow .15s}
+</style>
+</head>
+<body>
+<div id="root" class="mscroll" style="height:100vh;overflow-y:auto;background:#F5F4F1;font-family:Figtree,system-ui,sans-serif;color:#17181C"></div>
+<a href="index.html" style="position:fixed;bottom:22px;left:22px;z-index:70;display:flex;align-items:center;gap:7px;background:#17181C;color:#fff;font-family:Figtree,sans-serif;font-weight:700;font-size:13.5px;text-decoration:none;padding:10px 16px;border-radius:999px;box-shadow:0 8px 24px rgba(23,24,28,.25)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"/></svg> Inicio</a>
+
+<script>
+"use strict";
+const App = {
+  state:{
+    screen:'home', prev:'home', activeCat:null, activeProductId:17,
+    query:'', sort:'rel', onlyOffers:false, offerTab:'all', cart:{}, toast:null
+  },
+  CATS:[
+    {id:'frutas', name:'Frutas y Verduras', color:'#2E9E5B', soft:'#EAF5EE'},
+    {id:'lacteos', name:'Lácteos', color:'#2D7FF0', soft:'#E9F1FE'},
+    {id:'carnes', name:'Carnes', color:'#D9434E', soft:'#FBECEE'},
+    {id:'almacen', name:'Almacén', color:'#C98A2B', soft:'#F8F0E2'},
+    {id:'bebidas', name:'Bebidas', color:'#1FA6A6', soft:'#E5F4F4'},
+    {id:'limpieza', name:'Limpieza', color:'#6F6FE0', soft:'#EDEDFB'},
+    {id:'panaderia', name:'Panadería', color:'#C46A2B', soft:'#F5ECE3'},
+    {id:'congelados', name:'Congelados', color:'#3FA9D6', soft:'#E6F3FA'}
+  ],
+  PRODUCTS:[
+    {id:1, cat:'lacteos', name:'Leche Entera La Serenísima', brand:'La Serenísima', unit:'Sachet 1 L', price:990, off:1290},
+    {id:2, cat:'lacteos', name:'Yogur Bebible Ser Frutilla', brand:'Ser', unit:'Botella 900 g', price:1290},
+    {id:3, cat:'lacteos', name:'Queso Cremoso Punta del Agua', brand:'Punta del Agua', unit:'Por kg', price:8990},
+    {id:4, cat:'lacteos', name:'Manteca La Paulina', brand:'La Paulina', unit:'200 g', price:1850},
+    {id:5, cat:'lacteos', name:'Dulce de Leche Vacalin', brand:'Vacalin', unit:'400 g', price:2090, off:2490},
+    {id:6, cat:'frutas', name:'Banana Ecuador', brand:'Frescos', unit:'Por kg', price:1490},
+    {id:7, cat:'frutas', name:'Tomate Perita', brand:'Frescos', unit:'Por kg', price:1990},
+    {id:8, cat:'frutas', name:'Papa Blanca', brand:'Frescos', unit:'Por kg', price:890, off:1190},
+    {id:9, cat:'frutas', name:'Manzana Roja', brand:'Frescos', unit:'Por kg', price:2290},
+    {id:10, cat:'carnes', name:'Asado de Tira', brand:'Carnicería La Unión', unit:'Por kg', price:9990},
+    {id:11, cat:'carnes', name:'Pechuga de Pollo', brand:'Granja del Sol', unit:'Por kg', price:5490, off:6490},
+    {id:12, cat:'carnes', name:'Carne Picada Especial', brand:'Carnicería La Unión', unit:'Por kg', price:6990},
+    {id:13, cat:'almacen', name:'Fideos Tirabuzón Matarazzo', brand:'Matarazzo', unit:'500 g', price:990},
+    {id:14, cat:'almacen', name:'Arroz Largo Fino Gallo Oro', brand:'Gallo Oro', unit:'1 kg', price:1890},
+    {id:15, cat:'almacen', name:'Aceite de Girasol Natura', brand:'Natura', unit:'900 ml', price:2990, off:3490},
+    {id:16, cat:'almacen', name:'Azúcar Ledesma', brand:'Ledesma', unit:'1 kg', price:1290},
+    {id:17, cat:'almacen', name:'Yerba Mate Playadito', brand:'Playadito', unit:'1 kg', price:3990, off:4990},
+    {id:18, cat:'almacen', name:'Café La Virginia', brand:'La Virginia', unit:'250 g', price:4290},
+    {id:19, cat:'bebidas', name:'Coca-Cola Original', brand:'Coca-Cola', unit:'2,25 L', price:2890},
+    {id:20, cat:'bebidas', name:'Agua Mineral Villavicencio', brand:'Villavicencio', unit:'2 L', price:1190},
+    {id:21, cat:'bebidas', name:'Cerveza Quilmes Clásica', brand:'Quilmes', unit:'Litro retornable', price:1690, off:1990},
+    {id:22, cat:'bebidas', name:'Vino Malbec Trumpeter', brand:'Trumpeter', unit:'750 ml', price:5990},
+    {id:23, cat:'limpieza', name:'Lavandina Ayudín', brand:'Ayudín', unit:'1 L', price:990},
+    {id:24, cat:'limpieza', name:'Detergente Magistral', brand:'Magistral', unit:'750 ml', price:1990, off:2490},
+    {id:25, cat:'limpieza', name:'Papel Higiénico Higienol x4', brand:'Higienol', unit:'4 rollos', price:2990, off:3590},
+    {id:26, cat:'panaderia', name:'Pan Lactal Bimbo', brand:'Bimbo', unit:'460 g', price:2190},
+    {id:27, cat:'panaderia', name:'Medialunas de Manteca x6', brand:'Panadería La Unión', unit:'6 unidades', price:2490},
+    {id:28, cat:'congelados', name:'Bastones de Merluza', brand:'La Costa', unit:'400 g', price:4290, off:4990},
+    {id:29, cat:'congelados', name:'Papas Bastón McCain', brand:'McCain', unit:'720 g', price:3490},
+    {id:30, cat:'congelados', name:'Helado Crema Americana', brand:'Frigor', unit:'1 kg', price:5990, off:7490}
+  ],
+
+  format(n){ return '$' + Math.round(n).toLocaleString('es-AR'); },
+  esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); },
+  svg(size,color,sw,paths){
+    return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="'+(sw||1.85)+'" stroke-linecap="round" stroke-linejoin="round">'+
+      paths.map(d=>'<path d="'+d+'"/>').join('')+'</svg>';
+  },
+  catIcon(id,size){
+    const c=this.CATS.find(x=>x.id===id); const col=c?c.color:'#696D77';
+    const P={
+      frutas:['M12 8.2c-2.3-3-7.2-1.6-7.2 3.3 0 4.8 3.5 8.5 7.2 8.5s7.2-3.7 7.2-8.5c0-4.9-4.9-6.3-7.2-3.3z','M12 8.2c.2-2.3 1.7-3.5 3.6-3.9'],
+      lacteos:['M9 8.5 10 4h4l1 4.5V20H9z','M9 8.5h6','M11 12h2'],
+      carnes:['M5.6 12.6a6.4 5.4 0 0 1 12.8 0 4.1 4.1 0 0 1-8.2 1.6 3 3 0 0 1-4.6-1.6z','M16.2 7.6 19 5.2'],
+      almacen:['M6.6 6.2h10.8V19a1 1 0 0 1-1 1H7.6a1 1 0 0 1-1-1z','M6.6 10h10.8','M9.6 4h4.8l1 2.2H8.6z'],
+      bebidas:['M7.6 8h8.8l-1 11a1 1 0 0 1-1 1h-4.8a1 1 0 0 1-1-1z','M9.6 4.6h4.8','M9.2 8 8.2 5'],
+      limpieza:['M9 9h5v11H9z','M14 6.6l3.6-1.1','M9 9V6h4v3','M14 8.6l3.6-1.1'],
+      panaderia:['M5 13.6a4 4 0 0 1 4-4h6a4 4 0 0 1 0 8H9a4 4 0 0 1-4-4z','M9.6 11.2v4.6','M13 11.2v4.6'],
+      congelados:['M12 3.2v17.6','M4 7.6 20 16.4','M20 7.6 4 16.4','M12 3.2 9.8 5.8','M12 3.2l2.2 2.6','M12 20.8l-2.2-2.6','M12 20.8l2.2-2.6']
+    };
+    return this.svg(size,col,1.85,(P[id]||['M4 12h16']));
+  },
+  ui(name,size,color){
+    const col=color||'#17181C';
+    const M={
+      search:['M11 4.2a6.8 6.8 0 1 0 0 13.6 6.8 6.8 0 0 0 0-13.6z','M20.4 20.4 16 16'],
+      tag:['M12.4 3.2H4.4a1.2 1.2 0 0 0-1.2 1.2v8a1.2 1.2 0 0 0 .35.85l7.8 7.8a1.2 1.2 0 0 0 1.7 0l7.2-7.2a1.2 1.2 0 0 0 0-1.7l-7.8-7.8a1.2 1.2 0 0 0-.85-.35z','M7.4 7.6h.01'],
+      cart:['M2.6 4h2.3l2.1 11.1a1.6 1.6 0 0 0 1.6 1.3h7.7a1.6 1.6 0 0 0 1.6-1.25L21 7.6H6','M9 20.4h.02','M17 20.4h.02'],
+      next:['M9.5 5 16 12l-6.5 7'],
+      filter:['M4 6.6h16','M7 12h10','M10 17.4h4'],
+      star:['M12 3.6l2.55 5.55 6.05.55-4.55 4 1.35 5.95L12 16.9 6.6 20.2l1.35-5.95-4.55-4 6.05-.55z'],
+      pin:['M12 21s6.8-6.2 6.8-11A6.8 6.8 0 1 0 5.2 10c0 4.8 6.8 11 6.8 11z','M12 7.6a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8z'],
+      check:['M5 12.6 10 17l9.2-10.2'],
+      close:['M6 6l12 12','M18 6 6 18'],
+      menu:['M4 6.5h16','M4 12h16','M4 17.5h16'],
+      ticket:['M3 7.5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1V10a2 2 0 0 0 0 4v2.5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V14a2 2 0 0 0 0-4z'],
+      doc:['M6 3.5h8l4 4V20a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 20z','M14 3.5V8h4'],
+      user:['M12 4.2a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7z','M5 20c0-3.6 3.1-5.6 7-5.6s7 2 7 5.6'],
+      gear:['M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z','M19.4 13.5a1.6 1.6 0 0 0 .3 1.8l.05.05a2 2 0 1 1-2.8 2.8l-.05-.05a1.6 1.6 0 0 0-2.7 1.1V20a2 2 0 0 1-4 0v-.1a1.6 1.6 0 0 0-2.7-1.1l-.05.05a2 2 0 1 1-2.8-2.8l.05-.05A1.6 1.6 0 0 0 4.6 13.5H4.5a2 2 0 0 1 0-4h.1a1.6 1.6 0 0 0 1.1-2.7l-.05-.05a2 2 0 1 1 2.8-2.8l.05.05a1.6 1.6 0 0 0 2.7-1.1V2.5a2 2 0 0 1 4 0v.1a1.6 1.6 0 0 0 2.7 1.1l.05-.05a2 2 0 1 1 2.8 2.8l-.05.05a1.6 1.6 0 0 0-1.1 2.7h.1a2 2 0 0 1 0 4z']
+    };
+    return this.svg(size,col,1.9,(M[name]||[]));
+  },
+
+  disp(p){
+    const cat=this.CATS.find(c=>c.id===p.cat); const qty=this.state.cart[p.id]||0;
+    return {
+      id:p.id, name:p.name, brand:p.brand, unit:p.unit, catName:cat.name,
+      priceFmt:this.format(p.price), hasOff:!!p.off, offFmt:p.off?this.format(p.off):'',
+      pct:p.off?Math.round((1-p.price/p.off)*100):0, soft:cat.soft, color:cat.color, icon:this.catIcon(p.cat,52),
+      qty, notInCart:qty===0
+    };
+  },
+
+  // ---- actions ----
+  go(s){ this.state.screen=s; this.render(true); },
+  goWithPrev(s){ this.state.prev=this.state.screen; this.state.screen=s; this.render(true); },
+  openCat(id){ Object.assign(this.state,{prev:this.state.screen, activeCat:id, onlyOffers:false, sort:'rel', screen:'list'}); this.render(true); },
+  openAllCats(){ Object.assign(this.state,{prev:this.state.screen, activeCat:null, onlyOffers:false, screen:'list'}); this.render(true); },
+  openProduct(id){ Object.assign(this.state,{prev:this.state.screen, activeProductId:id, screen:'product'}); this.render(true); },
+  add(id){ const p=this.PRODUCTS.find(x=>x.id===id); this.state.cart[id]=(this.state.cart[id]||0)+1; this.toastMsg('Agregaste '+p.name.split(' ').slice(0,2).join(' '),1800); this.render(false); },
+  remove(id){ this.state.cart[id]=(this.state.cart[id]||0)-1; if(this.state.cart[id]<=0)delete this.state.cart[id]; this.render(false); },
+  cycleSort(){ const o=['rel','asc','desc']; const i=o.indexOf(this.state.sort); this.state.sort=o[(i+1)%3]; this.render(false); },
+  toggleOffers(){ this.state.onlyOffers=!this.state.onlyOffers; this.render(false); },
+  setQuery(v){ this.state.query=v; this.render(false,true); },
+  clearQuery(){ this.state.query=''; this.render(false); },
+  focusSearch(){ if(this.state.screen!=='search'){ this.go('search'); } },
+  setSort(){ this.cycleSort(); },
+  setOfferTab(k){ this.state.offerTab=k; this.render(false); },
+  searchFor(label){ this.state.query=label; this.state.screen='search'; this.render(true); },
+  clearCart(){ this.state.cart={}; this.render(false); },
+  toastMsg(m,d){ if(this._t)clearTimeout(this._t); this.state.toast=m; this.renderToast(); this._t=setTimeout(()=>{this.state.toast=null;this.renderToast();},d||1700); },
+
+  // ---- product card ----
+  card(p){
+    const off = p.hasOff ? '<div style="position:absolute;top:8px;left:8px;background:#E0202E;color:#fff;font-size:11px;font-weight:700;padding:3px 7px;border-radius:8px;letter-spacing:.01em;font-family:\'Space Grotesk\',sans-serif">-'+p.pct+'%</div>' : '';
+    const strike = p.hasOff ? '<span style="font-size:12px;color:#9A9DA4;text-decoration:line-through;font-weight:500">'+p.offFmt+'</span>' : '';
+    const action = p.notInCart
+      ? '<button onclick="event.stopPropagation();App.add('+p.id+')" style="width:100%;height:36px;border:1.5px solid #E0202E;background:#fff;color:#E0202E;border-radius:999px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">Agregar</button>'
+      : '<div style="width:100%;height:36px;display:flex;align-items:center;justify-content:space-between;border:1.5px solid #E0202E;border-radius:999px;overflow:hidden">'+
+          '<button onclick="event.stopPropagation();App.remove('+p.id+')" style="width:40px;height:100%;border:none;background:transparent;color:#E0202E;font-size:20px;font-weight:700;cursor:pointer;line-height:1">&minus;</button>'+
+          '<span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:15px;color:#17181C">'+p.qty+'</span>'+
+          '<button onclick="event.stopPropagation();App.add('+p.id+')" style="width:40px;height:100%;border:none;background:transparent;color:#E0202E;font-size:20px;font-weight:700;cursor:pointer;line-height:1">+</button>'+
+        '</div>';
+    return '<div class="pcard" onclick="App.openProduct('+p.id+')" style="background:#fff;border:1px solid #E6E3DD;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;height:100%;cursor:pointer">'+
+      '<div style="position:relative;width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:'+p.soft+'">'+
+        '<div style="transform:scale(1.15)">'+p.icon+'</div>'+off+'</div>'+
+      '<div style="padding:10px 11px 12px;display:flex;flex-direction:column;gap:3px;flex:1">'+
+        '<div style="display:flex;align-items:baseline;gap:6px;flex-wrap:wrap"><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:18px;color:#17181C;font-feature-settings:\'tnum\'">'+p.priceFmt+'</span>'+strike+'</div>'+
+        '<div style="font-size:13px;font-weight:600;color:#17181C;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:33px">'+this.esc(p.name)+'</div>'+
+        '<div style="font-size:11.5px;color:#696D77;margin-bottom:2px">'+this.esc(p.unit)+'</div>'+
+        '<div style="margin-top:auto;padding-top:6px">'+action+'</div>'+
+      '</div></div>';
+  },
+  grid(arr,cols){ return '<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:16px">'+arr.map(p=>this.card(p)).join('')+'</div>'; },
+
+  // ---- screens ----
+  header(){
+    const s=this.state;
+    const cartCount=Object.values(s.cart).reduce((a,b)=>a+b,0);
+    const subtotal=Object.keys(s.cart).reduce((a,id)=>{const p=this.PRODUCTS.find(x=>x.id===Number(id));return a+p.price*s.cart[id];},0);
+    const cartBadge = cartCount>0 ? '<span style="position:absolute;top:-6px;right:-6px;background:#17181C;color:#fff;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:0 5px;font-family:\'Space Grotesk\',sans-serif;border:2px solid #fff">'+cartCount+'</span>' : '';
+    const searchBorder = s.screen==='search'?'#E0202E':'#E6E3DD';
+    const clearBtn = s.query.length>0 ? '<div onclick="App.clearQuery()" style="cursor:pointer;display:flex">'+this.ui('close',17,'#9A9DA4')+'</div>' : '';
+    const navCats=this.CATS.map(c=>'<div onclick="App.openCat(\''+c.id+'\')" data-hover-row style="cursor:pointer;flex:none;font-weight:600;font-size:13.5px;color:#17181C;padding:6px 12px;border-radius:8px">'+this.esc(c.name)+'</div>').join('');
+    return '<div style="position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid #E6E3DD">'+
+      '<div style="background:#17181C;color:rgba(255,255,255,.85);font-size:12.5px"><div style="max-width:1200px;margin:0 auto;padding:7px 24px;display:flex;align-items:center;justify-content:space-between">'+
+        '<span style="display:flex;align-items:center;gap:7px">'+this.ui('pin',15,'rgba(255,255,255,.7)')+' Enviando a <span style="color:#fff;font-weight:700">Las Lajitas, Salta</span> · Sucursales abiertas hasta las 22h</span>'+
+        '<span style="display:flex;gap:18px;align-items:center"><span style="cursor:pointer">Ayuda</span><span style="cursor:pointer">Sucursales</span><span onclick="App.go(\'club\')" style="cursor:pointer;color:#FFC400;font-weight:700">Club La Unión</span></span>'+
+      '</div></div>'+
+      '<div style="max-width:1200px;margin:0 auto;padding:16px 24px;display:flex;align-items:center;gap:28px">'+
+        '<div onclick="App.go(\'home\')" style="cursor:pointer;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:28px;letter-spacing:-.02em;flex:none">la <span style="color:#E0202E">unión.</span></div>'+
+        '<div onclick="App.go(\'categories\')" style="cursor:pointer;flex:none;display:flex;align-items:center;gap:9px;background:#17181C;color:#fff;font-weight:700;font-size:14px;padding:12px 18px;border-radius:12px">'+this.ui('menu',18,'#fff')+' Categorías</div>'+
+        '<div style="flex:1;display:flex;align-items:center;gap:11px;background:#F5F4F1;border:1.5px solid '+searchBorder+';border-radius:12px;padding:0 16px;height:48px">'+this.ui('search',19,'#9A9DA4')+
+          '<input id="searchInput" value="'+this.esc(s.query)+'" oninput="App.setQuery(this.value)" onfocus="App.focusSearch()" placeholder="Buscá productos, marcas y más..." style="border:none;outline:none;background:transparent;flex:1;font-family:Figtree,sans-serif;font-size:15px;color:#17181C;min-width:0" />'+clearBtn+'</div>'+
+        '<div onclick="App.go(\'account\')" style="cursor:pointer;flex:none;display:flex;align-items:center;gap:9px"><div style="width:40px;height:40px;border-radius:50%;background:#E0202E;color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:15px">LF</div><div style="line-height:1.2"><div style="font-size:11.5px;color:#696D77">Hola,</div><div style="font-size:13.5px;font-weight:700">Lucía</div></div></div>'+
+        '<div onclick="App.goWithPrev(\'cart\')" style="cursor:pointer;flex:none;position:relative;display:flex;align-items:center;gap:9px;background:#E0202E;color:#fff;font-weight:700;font-size:14px;padding:12px 18px;border-radius:12px">'+this.ui('cart',20,'#fff')+' <span>'+this.format(subtotal)+'</span>'+cartBadge+'</div>'+
+      '</div>'+
+      '<div style="border-top:1px solid #F0EEEA"><div style="max-width:1200px;margin:0 auto;padding:0 24px;display:flex;gap:6px;align-items:center;height:46px;overflow-x:auto;scrollbar-width:none">'+
+        '<div onclick="App.go(\'offers\')" style="cursor:pointer;flex:none;display:flex;align-items:center;gap:7px;color:#E0202E;font-weight:700;font-size:13.5px;padding:6px 12px">'+this.ui('tag',16,'#E0202E')+' Ofertas de la semana</div>'+navCats+
+      '</div></div></div>';
+  },
+
+  homeScreen(){
+    const offers=this.PRODUCTS.filter(p=>p.off);
+    const navCats=this.CATS.map(c=>{
+      const count=this.PRODUCTS.filter(p=>p.cat===c.id).length;
+      return '<div onclick="App.openCat(\''+c.id+'\')" data-hover-cat style="cursor:pointer;background:#fff;border:1px solid #E6E3DD;border-radius:16px;padding:18px 12px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center"><div style="width:56px;height:56px;border-radius:16px;background:'+c.soft+';display:flex;align-items:center;justify-content:center">'+this.catIcon(c.id,40)+'</div><span style="font-size:12.5px;font-weight:600;line-height:1.2">'+this.esc(c.name)+'</span></div>';
+    }).join('');
+    const offersRow=offers.slice(0,5).map(p=>this.disp(p));
+    const featIdx=[16,0,18,26,9,13,18,19,5,25];
+    const featured=featIdx.map(i=>this.disp(this.PRODUCTS[i]));
+    return '<div>'+
+      '<div style="display:grid;grid-template-columns:1.62fr 1fr;gap:20px;margin-top:24px">'+
+        '<div onclick="App.go(\'offers\')" style="cursor:pointer;position:relative;overflow:hidden;background:#E0202E;border-radius:20px;padding:40px;min-height:280px;display:flex;flex-direction:column;justify-content:center">'+
+          '<div style="position:absolute;right:-50px;top:-50px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.08)"></div><div style="position:absolute;right:60px;bottom:-60px;width:180px;height:180px;border-radius:50%;background:rgba(255,196,0,.22)"></div>'+
+          '<div style="position:relative"><div style="font-size:12.5px;font-weight:700;letter-spacing:.16em;color:rgba(255,255,255,.85)">OFERTAS DE LA SEMANA</div>'+
+          '<div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:42px;line-height:1.05;color:#fff;margin-top:14px;max-width:440px;letter-spacing:-.01em">Hasta 35% off en almacén y limpieza</div>'+
+          '<div style="font-size:15px;color:rgba(255,255,255,.85);margin-top:12px">Válido hasta el domingo en todas las sucursales</div>'+
+          '<div style="display:inline-flex;align-items:center;gap:8px;margin-top:24px;background:#fff;color:#E0202E;font-weight:700;font-size:15px;padding:13px 22px;border-radius:999px">Ver el folleto completo '+this.ui('next',15,'#E0202E')+'</div></div></div>'+
+        '<div style="display:flex;flex-direction:column;gap:20px">'+
+          '<div onclick="App.go(\'club\')" style="cursor:pointer;flex:1;position:relative;overflow:hidden;background:#17181C;border-radius:20px;padding:26px;display:flex;flex-direction:column;justify-content:space-between"><div style="position:absolute;right:-30px;top:-30px;width:130px;height:130px;border-radius:50%;background:rgba(255,196,0,.16)"></div><div style="width:44px;height:44px;border-radius:12px;background:#FFC400;display:flex;align-items:center;justify-content:center">'+this.ui('star',22,'#17181C')+'</div><div><div style="color:#fff;font-weight:700;font-size:19px;font-family:\'Space Grotesk\',sans-serif">Club La Unión</div><div style="color:rgba(255,255,255,.6);font-size:13.5px;margin-top:3px">Precios exclusivos y cupones para socios</div></div></div>'+
+          '<div onclick="App.go(\'categories\')" style="cursor:pointer;flex:1;position:relative;overflow:hidden;background:#FFC400;border-radius:20px;padding:26px;display:flex;flex-direction:column;justify-content:space-between"><div style="width:44px;height:44px;border-radius:12px;background:#17181C;display:flex;align-items:center;justify-content:center">'+this.ui('menu',22,'#fff')+'</div><div><div style="color:#17181C;font-weight:700;font-size:19px;font-family:\'Space Grotesk\',sans-serif">8 categorías</div><div style="color:rgba(23,24,28,.6);font-size:13.5px;margin-top:3px">Todo lo del super, ordenado</div></div></div>'+
+        '</div></div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin:40px 0 18px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:22px">Comprá por categoría</div></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(8,1fr);gap:14px">'+navCats+'</div>'+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin:44px 0 18px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:22px">Ofertas destacadas</div><div onclick="App.go(\'offers\')" style="cursor:pointer;font-size:14px;font-weight:700;color:#E0202E;display:flex;align-items:center;gap:5px">Ver todas '+this.ui('next',15,'#E0202E')+'</div></div>'+
+      this.grid(offersRow,5)+
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin:44px 0 18px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:22px">Lo más comprado</div></div>'+
+      this.grid(featured,5)+
+    '</div>';
+  },
+
+  categoriesScreen(){
+    const cards=this.CATS.map(c=>{
+      const count=this.PRODUCTS.filter(p=>p.cat===c.id).length;
+      return '<div onclick="App.openCat(\''+c.id+'\')" style="cursor:pointer;position:relative;overflow:hidden;background:'+c.soft+';border-radius:18px;padding:22px;height:150px;display:flex;flex-direction:column;justify-content:space-between"><div style="transform:scale(1.1);transform-origin:left">'+this.catIcon(c.id,40)+'</div><div><div style="font-weight:700;font-size:16px">'+this.esc(c.name)+'</div><div style="font-size:12.5px;color:#696D77;margin-top:2px">'+count+' productos</div></div></div>';
+    }).join('');
+    return '<div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px;margin:28px 0 18px">Todas las categorías</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">'+cards+'</div></div>';
+  },
+
+  listScreen(){
+    const s=this.state;
+    let list=s.activeCat?this.PRODUCTS.filter(p=>p.cat===s.activeCat):this.PRODUCTS.slice();
+    if(s.onlyOffers)list=list.filter(p=>p.off);
+    if(s.sort==='asc')list=list.slice().sort((a,b)=>a.price-b.price);
+    if(s.sort==='desc')list=list.slice().sort((a,b)=>b.price-a.price);
+    const cat=s.activeCat?this.CATS.find(c=>c.id===s.activeCat):null;
+    const sortLabel=s.sort==='asc'?'Menor precio':s.sort==='desc'?'Mayor precio':'Relevancia';
+    const allW=s.activeCat?'500':'700', allC=s.activeCat?'#17181C':'#E0202E', allBg=s.activeCat?'transparent':'#FBECEE';
+    const sideCats=this.CATS.map(c=>{
+      const count=this.PRODUCTS.filter(p=>p.cat===c.id).length;
+      const w=s.activeCat===c.id?'700':'500', col=s.activeCat===c.id?'#E0202E':'#17181C', bg=s.activeCat===c.id?'#FBECEE':'transparent';
+      return '<div onclick="App.openCat(\''+c.id+'\')" style="cursor:pointer;font-size:14px;font-weight:'+w+';color:'+col+';padding:9px 12px;border-radius:10px;background:'+bg+';display:flex;justify-content:space-between"><span>'+this.esc(c.name)+'</span><span style="color:#9A9DA4;font-weight:500">'+count+'</span></div>';
+    }).join('');
+    const toggleBg=s.onlyOffers?'#E0202E':'#D6D4CE', knob=s.onlyOffers?'20px':'2px';
+    const gridHtml = list.length>0 ? this.grid(list.map(p=>this.disp(p)),4)
+      : '<div style="padding:70px 32px;text-align:center;background:#fff;border:1px solid #E6E3DD;border-radius:16px"><div style="font-size:16px;font-weight:700">No hay productos con esos filtros</div><div onclick="App.toggleOffers()" style="cursor:pointer;margin-top:10px;font-size:14px;font-weight:700;color:#E0202E">Quitar filtros</div></div>';
+    return '<div style="display:grid;grid-template-columns:230px 1fr;gap:28px;margin-top:24px;align-items:start">'+
+      '<div style="position:sticky;top:170px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:15px;margin-bottom:12px">Categorías</div>'+
+        '<div style="display:flex;flex-direction:column;gap:2px"><div onclick="App.openAllCats()" style="cursor:pointer;font-size:14px;font-weight:'+allW+';color:'+allC+';padding:9px 12px;border-radius:10px;background:'+allBg+'">Todos los productos</div>'+sideCats+'</div>'+
+        '<div style="height:1px;background:#E6E3DD;margin:18px 0"></div>'+
+        '<div onclick="App.toggleOffers()" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:4px 0"><div style="width:42px;height:24px;border-radius:999px;background:'+toggleBg+';position:relative;transition:.15s;flex:none"><div style="position:absolute;top:2px;left:'+knob+';width:20px;height:20px;border-radius:50%;background:#fff;transition:.15s"></div></div><span style="font-size:14px;font-weight:600">Solo ofertas</span></div>'+
+      '</div>'+
+      '<div><div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px"><div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px">'+this.esc(cat?cat.name:'Todos los productos')+'</div><div style="font-size:13.5px;color:#696D77;margin-top:3px">'+list.length+' productos</div></div>'+
+        '<div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;color:#696D77">Ordenar por</span><div onclick="App.setSort()" style="cursor:pointer;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E6E3DD;border-radius:10px;padding:10px 14px;font-size:13.5px;font-weight:600">'+this.ui('filter',16,'#17181C')+' '+sortLabel+'</div></div></div>'+gridHtml+'</div>'+
+    '</div>';
+  },
+
+  productScreen(){
+    const s=this.state;
+    const ap=this.PRODUCTS.find(p=>p.id===s.activeProductId)||this.PRODUCTS[0];
+    const d=this.disp(ap);
+    const desc=ap.name+' de '+ap.brand+'. Presentación '+ap.unit.toLowerCase()+'. Precio por unidad, sujeto a disponibilidad en sucursal. Producto seleccionado por su rotación y calidad.';
+    const related=this.PRODUCTS.filter(p=>p.cat===ap.cat&&p.id!==ap.id).slice(0,5).map(p=>this.disp(p));
+    const offBadge=d.hasOff?'<div style="position:absolute;top:20px;left:20px;background:#E0202E;color:#fff;font-size:15px;font-weight:700;padding:7px 14px;border-radius:11px;font-family:\'Space Grotesk\',sans-serif">-'+d.pct+'% OFF</div>':'';
+    const strike=d.hasOff?'<span style="font-size:20px;color:#9A9DA4;text-decoration:line-through">'+d.offFmt+'</span>':'';
+    const action = d.notInCart
+      ? '<button onclick="App.add('+ap.id+')" style="flex:1;height:56px;border:none;background:#E0202E;color:#fff;border-radius:14px;font-weight:700;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px">'+this.ui('cart',20,'#fff')+' Agregar al carrito</button>'
+      : '<div style="flex:1;height:56px;display:flex;align-items:center;justify-content:space-between;border:1.5px solid #E0202E;border-radius:14px;overflow:hidden"><button onclick="App.remove('+ap.id+')" style="width:60px;height:100%;border:none;background:transparent;color:#E0202E;font-size:26px;font-weight:700;cursor:pointer">&minus;</button><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:22px">'+d.qty+'</span><button onclick="App.add('+ap.id+')" style="width:60px;height:100%;border:none;background:transparent;color:#E0202E;font-size:26px;font-weight:700;cursor:pointer">+</button></div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;color:#1B8A53;font-size:14px;display:flex;align-items:center;gap:6px">'+this.ui('check',16,'#1B8A53')+' En carrito</div>';
+    return '<div><div style="font-size:13px;color:#696D77;margin:22px 0 18px;display:flex;align-items:center;gap:7px"><span onclick="App.go(\'home\')" style="cursor:pointer">Inicio</span>'+this.ui('next',13,'#C9CCD2')+'<span onclick="App.openCat(\''+ap.cat+'\')" style="cursor:pointer">'+this.esc(d.catName)+'</span>'+this.ui('next',13,'#C9CCD2')+'<span style="color:#17181C;font-weight:600">'+this.esc(d.name)+'</span></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start">'+
+        '<div style="background:'+d.soft+';border-radius:22px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;position:sticky;top:170px"><div style="transform:scale(3.4)">'+this.catIcon(ap.cat,52)+'</div>'+offBadge+'</div>'+
+        '<div style="padding-top:6px"><div style="font-size:12px;font-weight:700;letter-spacing:.1em;color:#E0202E;text-transform:uppercase">'+this.esc(d.catName)+'</div>'+
+          '<div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:32px;line-height:1.15;margin-top:8px">'+this.esc(d.name)+'</div>'+
+          '<div style="font-size:15px;color:#696D77;margin-top:5px">'+this.esc(d.brand)+' · '+this.esc(d.unit)+'</div>'+
+          '<div style="display:flex;align-items:baseline;gap:14px;margin-top:22px"><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:44px;font-feature-settings:\'tnum\'">'+d.priceFmt+'</span>'+strike+'</div>'+
+          '<div style="display:flex;align-items:center;gap:8px;margin-top:14px"><span style="width:9px;height:9px;border-radius:50%;background:#1B8A53"></span><span style="font-size:14px;font-weight:600;color:#1B8A53">En stock · entrega same day disponible</span></div>'+
+          '<div style="margin-top:28px;display:flex;gap:14px;align-items:center">'+action+'</div>'+
+          '<div style="height:1px;background:#E6E3DD;margin:28px 0"></div>'+
+          '<div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:17px;margin-bottom:8px">Descripción</div>'+
+          '<div style="font-size:14.5px;color:#696D77;line-height:1.55">'+this.esc(desc)+'</div>'+
+          '<div style="margin-top:22px;border:1px solid #E6E3DD;border-radius:14px;overflow:hidden;background:#fff">'+
+            '<div style="display:flex;justify-content:space-between;padding:14px 16px;font-size:14px"><span style="color:#696D77">Marca</span><span style="font-weight:600">'+this.esc(d.brand)+'</span></div><div style="height:1px;background:#E6E3DD"></div>'+
+            '<div style="display:flex;justify-content:space-between;padding:14px 16px;font-size:14px"><span style="color:#696D77">Presentación</span><span style="font-weight:600">'+this.esc(d.unit)+'</span></div><div style="height:1px;background:#E6E3DD"></div>'+
+            '<div style="display:flex;justify-content:space-between;padding:14px 16px;font-size:14px"><span style="color:#696D77">Categoría</span><span style="font-weight:600">'+this.esc(d.catName)+'</span></div></div>'+
+        '</div></div>'+
+      '<div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:22px;margin:48px 0 18px">Productos relacionados</div>'+this.grid(related,5)+'</div>';
+  },
+
+  searchScreen(){
+    const s=this.state;
+    const norm=t=>t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    const q=norm(s.query.trim());
+    const res=q?this.PRODUCTS.filter(p=>norm(p.name+' '+p.brand+' '+this.CATS.find(c=>c.id===p.cat).name).includes(q)):[];
+    let body;
+    if(q.length>0){
+      if(res.length>0){
+        body='<div style="font-size:15px;color:#696D77;margin-bottom:18px">'+res.length+' resultados para "<span style="color:#17181C;font-weight:700">'+this.esc(s.query)+'</span>"</div>'+this.grid(res.map(p=>this.disp(p)),5);
+      } else {
+        body='<div style="padding:80px 32px;text-align:center"><div style="width:72px;height:72px;border-radius:50%;background:#fff;border:1px solid #E6E3DD;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">'+this.ui('search',28,'#C9CCD2')+'</div><div style="font-size:18px;font-weight:700">Sin resultados para "'+this.esc(s.query)+'"</div><div style="font-size:14px;color:#9A9DA4;margin-top:6px">Probá con otra palabra o revisá la ortografía</div></div>';
+      }
+    } else {
+      const suggestions=['Leche','Yerba','Coca-Cola','Aceite','Pan','Detergente','Asado','Café'].map(l=>'<div onclick="App.searchFor(\''+l+'\')" style="cursor:pointer;background:#fff;border:1px solid #E6E3DD;border-radius:999px;padding:10px 18px;font-size:14px;font-weight:600">'+l+'</div>').join('');
+      const cats=this.CATS.map(c=>{const count=this.PRODUCTS.filter(p=>p.cat===c.id).length;return '<div onclick="App.openCat(\''+c.id+'\')" style="cursor:pointer;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #E6E3DD;border-radius:14px;padding:14px"><div style="width:48px;height:48px;border-radius:12px;background:'+c.soft+';display:flex;align-items:center;justify-content:center;flex:none;transform:scale(.85)">'+this.catIcon(c.id,40)+'</div><div><div style="font-weight:700;font-size:14.5px">'+this.esc(c.name)+'</div><div style="font-size:12.5px;color:#696D77">'+count+' productos</div></div></div>';}).join('');
+      body='<div style="font-size:15px;font-weight:700;margin-bottom:14px">Buscados frecuentemente</div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:32px">'+suggestions+'</div><div style="font-size:15px;font-weight:700;margin-bottom:14px">Explorá por categoría</div><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">'+cats+'</div>';
+    }
+    return '<div style="margin-top:26px">'+body+'</div>';
+  },
+
+  offersScreen(){
+    const s=this.state;
+    const offers=this.PRODUCTS.filter(p=>p.off);
+    const secDefs=[
+      {title:'Frescos', cats:['frutas','carnes','lacteos','panaderia']},
+      {title:'Almacén', cats:['almacen']},
+      {title:'Bebidas', cats:['bebidas']},
+      {title:'Limpieza y hogar', cats:['limpieza','congelados']}
+    ];
+    let sections=secDefs.map(d=>({title:d.title, items:offers.filter(p=>d.cats.includes(p.cat)).map(p=>this.disp(p))})).filter(x=>x.items.length);
+    if(s.offerTab!=='all')sections=sections.filter(x=>x.title===s.offerTab);
+    const tabs=[{label:'Todas',key:'all'}].concat(secDefs.filter(d=>offers.some(p=>d.cats.includes(p.cat))).map(d=>({label:d.title,key:d.title})))
+      .map(t=>{const on=s.offerTab===t.key;return '<div onclick="App.setOfferTab(\''+t.key+'\')" style="cursor:pointer;border-radius:999px;padding:9px 18px;font-size:14px;font-weight:700;background:'+(on?'#E0202E':'#fff')+';border:1px solid '+(on?'#E0202E':'#E6E3DD')+';color:'+(on?'#fff':'#17181C')+'">'+t.label+'</div>';}).join('');
+    const secHtml=sections.map(sec=>'<div style="margin-top:32px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:20px;margin-bottom:16px">'+this.esc(sec.title)+'</div>'+this.grid(sec.items,5)+'</div>').join('');
+    return '<div><div style="position:relative;overflow:hidden;background:#E0202E;border-radius:20px;padding:34px 40px;margin-top:24px"><div style="position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.08)"></div><div style="position:relative"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:30px;color:#fff">Folleto de ofertas</div><div style="font-size:15px;color:rgba(255,255,255,.85);margin-top:5px">Válido hasta el domingo · todas las sucursales</div></div></div>'+
+      '<div style="display:flex;gap:10px;margin:22px 0 4px;flex-wrap:wrap">'+tabs+'</div>'+secHtml+'</div>';
+  },
+
+  cartScreen(){
+    const s=this.state;
+    const ids=Object.keys(s.cart);
+    if(ids.length===0){
+      return '<div style="margin-top:26px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px;margin-bottom:18px">Mi carrito</div><div style="padding:80px 32px;text-align:center;background:#fff;border:1px solid #E6E3DD;border-radius:18px"><div style="width:76px;height:76px;border-radius:50%;background:#F5F4F1;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">'+this.ui('cart',30,'#C9CCD2')+'</div><div style="font-size:18px;font-weight:700">Tu carrito está vacío</div><div style="font-size:14px;color:#9A9DA4;margin-top:6px">Agregá productos para armar tu lista</div><div onclick="App.go(\'home\')" style="cursor:pointer;margin-top:20px;display:inline-block;background:#E0202E;color:#fff;font-weight:700;font-size:15px;padding:13px 26px;border-radius:999px">Explorar productos</div></div></div>';
+    }
+    const items=ids.map(id=>{const p=this.PRODUCTS.find(x=>x.id===Number(id));const c=this.CATS.find(k=>k.id===p.cat);const qty=s.cart[id];
+      return '<div style="display:flex;gap:16px;align-items:center;background:#fff;border:1px solid #E6E3DD;border-radius:16px;padding:14px"><div style="width:72px;height:72px;border-radius:12px;background:'+c.soft+';display:flex;align-items:center;justify-content:center;flex:none"><div style="transform:scale(.75)">'+this.catIcon(p.cat,52)+'</div></div><div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:600">'+this.esc(p.name)+'</div><div style="font-size:13px;color:#696D77;margin-top:2px">'+this.esc(p.unit)+'</div></div><div style="display:flex;align-items:center;border:1.5px solid #E6E3DD;border-radius:999px;height:40px;flex:none"><button onclick="App.remove('+p.id+')" style="width:40px;height:100%;border:none;background:transparent;color:#E0202E;font-size:20px;font-weight:700;cursor:pointer">&minus;</button><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:15px;min-width:22px;text-align:center">'+qty+'</span><button onclick="App.add('+p.id+')" style="width:40px;height:100%;border:none;background:transparent;color:#E0202E;font-size:20px;font-weight:700;cursor:pointer">+</button></div><div style="width:96px;text-align:right;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:17px;flex:none">'+this.format(p.price*qty)+'</div></div>';
+    }).join('');
+    const subtotal=ids.reduce((a,id)=>{const p=this.PRODUCTS.find(x=>x.id===Number(id));return a+p.price*s.cart[id];},0);
+    const savings=ids.reduce((a,id)=>{const p=this.PRODUCTS.find(x=>x.id===Number(id));return a+(p.off?(p.off-p.price)*s.cart[id]:0);},0);
+    return '<div style="margin-top:26px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px;margin-bottom:18px">Mi carrito</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 360px;gap:28px;align-items:start"><div style="display:flex;flex-direction:column;gap:12px">'+items+'</div>'+
+      '<div style="position:sticky;top:170px;background:#fff;border:1px solid #E6E3DD;border-radius:18px;padding:22px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:18px;margin-bottom:16px">Resumen</div>'+
+        '<div style="display:flex;justify-content:space-between;font-size:14px;color:#696D77;margin-bottom:10px"><span>Subtotal</span><span style="color:#17181C;font-weight:600">'+this.format(subtotal)+'</span></div>'+
+        '<div style="display:flex;justify-content:space-between;font-size:14px;color:#696D77"><span>Ahorro del club</span><span style="color:#1B8A53;font-weight:600">-'+this.format(savings)+'</span></div>'+
+        '<div style="height:1px;background:#E6E3DD;margin:16px 0"></div>'+
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:18px"><span style="font-weight:700;font-size:16px">Total estimado</span><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px">'+this.format(subtotal)+'</span></div>'+
+        '<div onclick="App.toastMsg(\'Localizador de sucursales — próximamente\')" style="cursor:pointer;text-align:center;background:#17181C;color:#fff;font-weight:700;font-size:15px;padding:15px;border-radius:14px">Ver disponibilidad en sucursal</div>'+
+        '<div onclick="App.clearCart()" style="cursor:pointer;text-align:center;font-size:13.5px;font-weight:700;color:#696D77;margin-top:14px">Vaciar carrito</div>'+
+        '<div style="margin-top:16px;background:#FFF6E6;border:1px solid #F2DFB0;border-radius:12px;padding:12px 14px;font-size:12.5px;color:#7A5A12;line-height:1.45">Referencia visual. La Unión todavía no vende online — usá esta lista para comprar en sucursal.</div>'+
+      '</div></div></div>';
+  },
+
+  accountScreen(){
+    const menu=[
+      {label:'Mis cupones', icon:this.ui('ticket',19,'#E0202E'), soft:'#FBECEE', act:"App.go('club')"},
+      {label:'Historial de visitas', icon:this.ui('doc',19,'#2D7FF0'), soft:'#E9F1FE', act:""},
+      {label:'Sucursal favorita', icon:this.ui('pin',19,'#1B8A53'), soft:'#EAF5EE', act:"App.toastMsg('Localizador de sucursales — próximamente')"},
+      {label:'Datos personales', icon:this.ui('user',19,'#C98A2B'), soft:'#F8F0E2', act:""},
+      {label:'Métodos de pago', icon:this.ui('ticket',19,'#6F6FE0'), soft:'#EDEDFB', act:""},
+      {label:'Configuración', icon:this.ui('gear',19,'#696D77'), soft:'#EFEEEA', act:""}
+    ].map(m=>'<div onclick="'+m.act+'" style="cursor:pointer;display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #E6E3DD;border-radius:14px;padding:18px"><div style="width:40px;height:40px;border-radius:11px;background:'+m.soft+';display:flex;align-items:center;justify-content:center;flex:none">'+m.icon+'</div><span style="flex:1;font-size:14.5px;font-weight:600">'+m.label+'</span>'+this.ui('next',18,'#C9CCD2')+'</div>').join('');
+    return '<div style="margin-top:26px;max-width:760px"><div style="display:flex;align-items:center;gap:18px;background:#fff;border:1px solid #E6E3DD;border-radius:18px;padding:22px"><div style="width:62px;height:62px;border-radius:50%;background:#E0202E;color:#fff;display:flex;align-items:center;justify-content:center;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:22px">LF</div><div><div style="font-weight:700;font-size:19px">Lucía Fernández</div><div style="font-size:14px;color:#696D77">lucia.f@gmail.com</div></div><div style="margin-left:auto;background:#FFC400;color:#17181C;font-size:12px;font-weight:700;padding:6px 13px;border-radius:999px">SOCIO VIP</div></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px">'+menu+'</div></div>';
+  },
+
+  clubScreen(){
+    const barcode=[2,1,3,1,1,2,4,1,2,1,3,1,1,2,1,4,2,1,1,3,2,1,2,1,4,1,2,3,1,1,2,1].map(w=>'<div style="width:'+w+'px;height:100%;background:#17181C"></div>').join('');
+    const coupons=[
+      {value:'15%', bg:'#FFF6DB', fg:'#B8860B', title:'15% en Almacén', detail:'Comprando 3 productos · vence 30/06'},
+      {value:'2x1', bg:'#FBECEE', fg:'#D9434E', title:'2x1 en Lácteos', detail:'La Serenísima y Ser · fines de semana'},
+      {value:'$1k', bg:'#EAF5EE', fg:'#1B8A53', title:'$1.000 off próxima visita', detail:'Compra mínima $15.000'}
+    ].map(c=>'<div style="display:flex;align-items:center;background:#fff;border:1px solid #E6E3DD;border-radius:16px;overflow:hidden"><div style="width:88px;flex:none;align-self:stretch;background:'+c.bg+';display:flex;align-items:center;justify-content:center;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:22px;color:'+c.fg+'">'+c.value+'</div><div style="flex:1;padding:14px 16px"><div style="font-weight:700;font-size:14.5px">'+c.title+'</div><div style="font-size:12.5px;color:#696D77;margin-top:3px">'+c.detail+'</div></div></div>').join('');
+    const benefits=['Precios exclusivos para socios','Acumulás puntos en cada compra','Cupones personalizados según tus consumos','Acceso anticipado a las ofertas de la semana']
+      .map((text,i)=>'<div style="display:flex;align-items:center;gap:13px;padding:16px 18px;border-top:'+(i===0?'none':'1px solid #E6E3DD')+'"><span style="width:9px;height:9px;border-radius:50%;background:#FFC400;flex:none"></span><span style="font-size:14.5px">'+text+'</span></div>').join('');
+    return '<div style="margin-top:26px;display:grid;grid-template-columns:380px 1fr;gap:32px;align-items:start">'+
+      '<div style="position:sticky;top:170px"><div style="background:#17181C;border-radius:20px;padding:26px;position:relative;overflow:hidden"><div style="position:absolute;right:-40px;top:-40px;width:170px;height:170px;border-radius:50%;background:rgba(255,196,0,.16)"></div>'+
+        '<div style="position:relative;display:flex;align-items:center;justify-content:space-between"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;color:#fff;font-size:22px">Club <span style="color:#FFC400">La Unión</span></div><div style="background:#FFC400;color:#17181C;font-size:12px;font-weight:700;padding:5px 12px;border-radius:999px">SOCIO VIP</div></div>'+
+        '<div style="color:rgba(255,255,255,.65);font-size:13px;margin-top:22px">Socio</div><div style="color:#fff;font-weight:700;font-size:18px;font-family:\'Space Grotesk\',sans-serif">Lucía Fernández</div>'+
+        '<div style="background:#fff;border-radius:10px;padding:12px;margin-top:16px;display:flex;align-items:flex-end;gap:2px;height:64px">'+barcode+'</div>'+
+        '<div style="text-align:center;color:rgba(255,255,255,.7);font-size:13px;margin-top:10px;font-family:\'Space Grotesk\',sans-serif;letter-spacing:.2em">7421 0098 5523</div></div></div>'+
+      '<div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:20px;margin-bottom:14px">Cupones activos</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'+coupons+'</div>'+
+        '<div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:20px;margin:32px 0 14px">Tus beneficios</div><div style="background:#fff;border:1px solid #E6E3DD;border-radius:16px;overflow:hidden">'+benefits+'</div></div>'+
+    '</div>';
+  },
+
+  footer(){
+    return '<div style="background:#17181C;color:rgba(255,255,255,.6);padding:40px 24px"><div style="max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:22px;color:#fff">la <span style="color:#E0202E">unión.</span></div><div style="font-size:13px">El super de tu barrio, ahora también en pantalla. © 2025 La Unión.</div></div></div>';
+  },
+
+  renderToast(){
+    let el=document.getElementById('toast');
+    if(this.state.toast){
+      if(!el){ el=document.createElement('div'); el.id='toast'; document.body.appendChild(el); }
+      el.style.cssText='position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#17181C;color:#fff;font-size:14px;font-weight:600;padding:13px 22px;border-radius:999px;display:flex;align-items:center;gap:9px;box-shadow:0 12px 36px rgba(0,0,0,.3);animation:dtoast-in .25s ease;white-space:nowrap;z-index:60';
+      el.innerHTML=this.ui('check',16,'#fff')+' '+this.esc(this.state.toast);
+    } else if(el){ el.remove(); }
+  },
+
+  render(scrollTop, keepFocus){
+    const s=this.state;
+    let body;
+    switch(s.screen){
+      case 'home': body=this.homeScreen(); break;
+      case 'categories': body=this.categoriesScreen(); break;
+      case 'list': body=this.listScreen(); break;
+      case 'product': body=this.productScreen(); break;
+      case 'search': body=this.searchScreen(); break;
+      case 'offers': body=this.offersScreen(); break;
+      case 'cart': body=this.cartScreen(); break;
+      case 'account': body=this.accountScreen(); break;
+      case 'club': body=this.clubScreen(); break;
+      default: body=this.homeScreen();
+    }
+    const root=document.getElementById('root');
+    const prevFocus=keepFocus&&document.activeElement&&document.activeElement.id==='searchInput';
+    const selStart=prevFocus?document.activeElement.selectionStart:null;
+    root.innerHTML=this.header()+'<div style="max-width:1200px;margin:0 auto;padding:0 24px 64px">'+body+'</div>'+this.footer();
+    this.renderToast();
+    if(prevFocus){ const inp=document.getElementById('searchInput'); if(inp){ inp.focus(); try{inp.setSelectionRange(selStart,selStart);}catch(e){} } }
+    if(scrollTop){ root.scrollTop=0; }
+  }
+};
+App.render(true);
+</script>
+</body>
+</html>

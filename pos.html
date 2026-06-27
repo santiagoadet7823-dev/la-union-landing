@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La Unión — Caja POS</title>
+<link rel="icon" href="images/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0}
+  .pscroll::-webkit-scrollbar{width:10px}
+  .pscroll::-webkit-scrollbar-thumb{background:#d6d4ce;border-radius:8px}
+  .pscroll::-webkit-scrollbar-track{background:transparent}
+  @keyframes pfade{from{opacity:0}to{opacity:1}}
+  @keyframes ppop{0%{opacity:0;transform:scale(.96)}100%{opacity:1;transform:scale(1)}}
+  @keyframes ppulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .pkey:active{background:#EFEDE8 !important;transform:scale(.97)}
+  .ptile:active{transform:scale(.97)}
+  button{font-family:inherit}
+  .backlink{position:fixed;top:18px;left:18px;z-index:80;display:flex;align-items:center;gap:7px;background:#17181C;color:#fff;font-family:Figtree,sans-serif;font-weight:700;font-size:13px;text-decoration:none;padding:9px 15px;border-radius:999px;box-shadow:0 8px 24px rgba(23,24,28,.25)}
+</style>
+</head>
+<body>
+<a class="backlink" href="index.html"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 5 8 12l6.5 7"/></svg> Inicio</a>
+<div style="height:100vh;width:100%;background:#E7E5E0;display:flex;align-items:center;justify-content:center;padding:20px;overflow:hidden;font-family:Figtree,system-ui,sans-serif">
+  <div id="fit" style="width:1180px;height:820px;flex:none;transform-origin:center center;background:#0E0F12;border-radius:30px;padding:14px;box-shadow:0 40px 90px rgba(23,24,28,.4);position:relative">
+    <div style="width:100%;height:100%;background:#F5F4F1;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;position:relative;color:#17181C">
+      <div style="flex:none;height:60px;background:#fff;border-bottom:1px solid #E6E3DD;display:flex;align-items:center;padding:0 22px;gap:18px">
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:22px;letter-spacing:-.02em">la <span style="color:#E0202E">unión</span></div>
+        <div style="width:1px;height:26px;background:#E6E3DD"></div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:50%;background:#1B8A53"></span><span style="font-size:13.5px;font-weight:700">Caja 1 abierta</span><span style="font-size:13px;color:#9A9DA4">· Las Lajitas</span></div>
+        <div style="flex:1"></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:13px;color:#696D77">Cajero</span><div style="display:flex;align-items:center;gap:8px;background:#F5F4F1;border-radius:999px;padding:5px 14px 5px 6px"><div style="width:30px;height:30px;border-radius:50%;background:#6F6FE0;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px">SR</div><span style="font-size:13.5px;font-weight:700">Sofía Ruiz</span></div></div>
+      </div>
+      <div style="flex:1;display:flex;min-height:0">
+        <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+          <div style="flex:none;padding:16px 22px 12px">
+            <div style="display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid #E6E3DD;border-radius:14px;padding:0 18px;height:54px">
+              <span id="searchIcon"></span>
+              <input id="posSearch" oninput="POS.setQuery(this.value)" placeholder="Buscar producto o escanear código de barras..." style="border:none;outline:none;background:transparent;flex:1;font-family:Figtree,sans-serif;font-size:16px;min-width:0" />
+              <span id="scanIcon"></span>
+            </div>
+            <div id="catChips" style="display:flex;gap:9px;margin-top:13px;overflow-x:auto;scrollbar-width:none"></div>
+          </div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:4px 22px 22px">
+            <div id="prodGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:13px"></div>
+          </div>
+        </div>
+        <div style="width:392px;flex:none;background:#fff;border-left:1px solid #E6E3DD;display:flex;flex-direction:column;min-height:0">
+          <div style="flex:none;padding:18px 22px 14px;border-bottom:1px solid #E6E3DD;display:flex;align-items:center;justify-content:space-between">
+            <div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:18px">Ticket</div><div id="ticketCount" style="font-size:12.5px;color:#696D77;margin-top:1px"></div></div>
+            <div id="clearBtn"></div>
+          </div>
+          <div class="pscroll" style="flex:1;overflow-y:auto;padding:6px 16px"><div id="ticketList"></div></div>
+          <div style="flex:none;border-top:1px solid #E6E3DD;padding:16px 22px 18px">
+            <div style="display:flex;justify-content:space-between;font-size:13.5px;color:#696D77;margin-bottom:6px"><span>Subtotal</span><span id="subtotal" style="color:#17181C;font-weight:600"></span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13.5px;color:#696D77"><span>IVA incluido</span><span id="iva" style="color:#17181C;font-weight:600"></span></div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin:12px 0 14px"><span style="font-weight:700;font-size:16px">Total</span><span id="totalBig" style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:32px"></span></div>
+            <button id="cobrarBtn" onclick="POS.openPay()" class="ptile" style="width:100%;height:62px;border:none;border-radius:15px;font-weight:700;font-size:19px;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .08s;color:#fff"></button>
+          </div>
+        </div>
+      </div>
+      <div id="payLayer"></div>
+      <div id="toast"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+const POS = {
+  state:{ query:'', cat:null, ticket:{}, payOpen:false, payMethod:'efectivo', cashGiven:'', paySuccess:false, successMethod:'efectivo', toast:null, ticketNumber:1042 },
+  CATS:[
+    {id:'frutas',name:'Frutas y Verduras',color:'#2E9E5B',soft:'#EAF5EE'},
+    {id:'lacteos',name:'Lácteos',color:'#2D7FF0',soft:'#E9F1FE'},
+    {id:'carnes',name:'Carnes',color:'#D9434E',soft:'#FBECEE'},
+    {id:'almacen',name:'Almacén',color:'#C98A2B',soft:'#F8F0E2'},
+    {id:'bebidas',name:'Bebidas',color:'#1FA6A6',soft:'#E5F4F4'},
+    {id:'limpieza',name:'Limpieza',color:'#6F6FE0',soft:'#EDEDFB'},
+    {id:'panaderia',name:'Panadería',color:'#C46A2B',soft:'#F5ECE3'},
+    {id:'congelados',name:'Congelados',color:'#3FA9D6',soft:'#E6F3FA'}
+  ],
+  PRODUCTS:[
+    {id:1,cat:'lacteos',name:'Leche Entera La Serenísima',unit:'Sachet 1 L',price:990},
+    {id:2,cat:'lacteos',name:'Yogur Bebible Ser Frutilla',unit:'Botella 900 g',price:1290},
+    {id:3,cat:'lacteos',name:'Queso Cremoso Punta del Agua',unit:'Por kg',price:8990},
+    {id:4,cat:'lacteos',name:'Manteca La Paulina',unit:'200 g',price:1850},
+    {id:5,cat:'lacteos',name:'Dulce de Leche Vacalin',unit:'400 g',price:2090},
+    {id:6,cat:'frutas',name:'Banana Ecuador',unit:'Por kg',price:1490},
+    {id:7,cat:'frutas',name:'Tomate Perita',unit:'Por kg',price:1990},
+    {id:8,cat:'frutas',name:'Papa Blanca',unit:'Por kg',price:890},
+    {id:9,cat:'frutas',name:'Manzana Roja',unit:'Por kg',price:2290},
+    {id:10,cat:'carnes',name:'Asado de Tira',unit:'Por kg',price:9990},
+    {id:11,cat:'carnes',name:'Pechuga de Pollo',unit:'Por kg',price:5490},
+    {id:12,cat:'carnes',name:'Carne Picada Especial',unit:'Por kg',price:6990},
+    {id:13,cat:'almacen',name:'Fideos Tirabuzón Matarazzo',unit:'500 g',price:990},
+    {id:14,cat:'almacen',name:'Arroz Largo Fino Gallo Oro',unit:'1 kg',price:1890},
+    {id:15,cat:'almacen',name:'Aceite de Girasol Natura',unit:'900 ml',price:2990},
+    {id:16,cat:'almacen',name:'Azúcar Ledesma',unit:'1 kg',price:1290},
+    {id:17,cat:'almacen',name:'Yerba Mate Playadito',unit:'1 kg',price:3990},
+    {id:18,cat:'almacen',name:'Café La Virginia',unit:'250 g',price:4290},
+    {id:19,cat:'bebidas',name:'Coca-Cola Original',unit:'2,25 L',price:2890},
+    {id:20,cat:'bebidas',name:'Agua Mineral Villavicencio',unit:'2 L',price:1190},
+    {id:21,cat:'bebidas',name:'Cerveza Quilmes Clásica',unit:'Litro retornable',price:1690},
+    {id:22,cat:'bebidas',name:'Vino Malbec Trumpeter',unit:'750 ml',price:5990},
+    {id:23,cat:'limpieza',name:'Lavandina Ayudín',unit:'1 L',price:990},
+    {id:24,cat:'limpieza',name:'Detergente Magistral',unit:'750 ml',price:1990},
+    {id:25,cat:'limpieza',name:'Papel Higiénico Higienol x4',unit:'4 rollos',price:2990},
+    {id:26,cat:'panaderia',name:'Pan Lactal Bimbo',unit:'460 g',price:2190},
+    {id:27,cat:'panaderia',name:'Medialunas de Manteca x6',unit:'6 unidades',price:2490},
+    {id:28,cat:'congelados',name:'Bastones de Merluza',unit:'400 g',price:4290},
+    {id:29,cat:'congelados',name:'Papas Bastón McCain',unit:'720 g',price:3490},
+    {id:30,cat:'congelados',name:'Helado Crema Americana',unit:'1 kg',price:5990}
+  ],
+  format(n){ return '$'+Math.round(n).toLocaleString('es-AR'); },
+  esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); },
+  svg(size,color,sw,paths){ return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="'+(sw||1.85)+'" stroke-linecap="round" stroke-linejoin="round">'+paths.map(d=>'<path d="'+d+'"/>').join('')+'</svg>'; },
+  catIcon(id,size){
+    const c=this.CATS.find(x=>x.id===id); const col=c?c.color:'#696D77';
+    const P={frutas:['M12 8.2c-2.3-3-7.2-1.6-7.2 3.3 0 4.8 3.5 8.5 7.2 8.5s7.2-3.7 7.2-8.5c0-4.9-4.9-6.3-7.2-3.3z','M12 8.2c.2-2.3 1.7-3.5 3.6-3.9'],lacteos:['M9 8.5 10 4h4l1 4.5V20H9z','M9 8.5h6','M11 12h2'],carnes:['M5.6 12.6a6.4 5.4 0 0 1 12.8 0 4.1 4.1 0 0 1-8.2 1.6 3 3 0 0 1-4.6-1.6z','M16.2 7.6 19 5.2'],almacen:['M6.6 6.2h10.8V19a1 1 0 0 1-1 1H7.6a1 1 0 0 1-1-1z','M6.6 10h10.8','M9.6 4h4.8l1 2.2H8.6z'],bebidas:['M7.6 8h8.8l-1 11a1 1 0 0 1-1 1h-4.8a1 1 0 0 1-1-1z','M9.6 4.6h4.8','M9.2 8 8.2 5'],limpieza:['M9 9h5v11H9z','M14 6.6l3.6-1.1','M9 9V6h4v3','M14 8.6l3.6-1.1'],panaderia:['M5 13.6a4 4 0 0 1 4-4h6a4 4 0 0 1 0 8H9a4 4 0 0 1-4-4z','M9.6 11.2v4.6','M13 11.2v4.6'],congelados:['M12 3.2v17.6','M4 7.6 20 16.4','M20 7.6 4 16.4','M12 3.2 9.8 5.8','M12 3.2l2.2 2.6','M12 20.8l-2.2-2.6','M12 20.8l2.2-2.6']};
+    return this.svg(size,col,1.85,(P[id]||['M4 12h16']));
+  },
+  ui(name,size,color,sw){
+    const col=color||'#17181C';
+    const M={
+      search:['M11 4.2a6.8 6.8 0 1 0 0 13.6 6.8 6.8 0 0 0 0-13.6z','M20.4 20.4 16 16'],
+      scan:['M4 7V5.5a1.5 1.5 0 0 1 1.5-1.5H7','M17 4h1.5A1.5 1.5 0 0 1 20 5.5V7','M20 17v1.5a1.5 1.5 0 0 1-1.5 1.5H17','M7 20H5.5A1.5 1.5 0 0 1 4 18.5V17','M4 12h16'],
+      cart:['M2.6 4h2.3l2.1 11.1a1.6 1.6 0 0 0 1.6 1.3h7.7a1.6 1.6 0 0 0 1.6-1.25L21 7.6H6','M9 20.4h.02','M17 20.4h.02'],
+      check:['M5 12.6 10 17l9.2-10.2'],
+      trash:['M4 6.5h16','M9 6.5V4.5h6v2','M6.5 6.5 7.5 20a1 1 0 0 0 1 1h7a1 1 0 0 0 1-1l1-13.5'],
+      cash:['M3 6.5h18a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z','M12 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z','M5.5 9.5h.01','M18.5 14.5h.01'],
+      card:['M3 6.5h18a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z','M2 10h20','M6 14.5h4'],
+      qr:['M4 4h6v6H4z','M14 4h6v6h-6z','M4 14h6v6H4z','M14 14h2v2h-2z','M18 14h2v2h-2z','M14 18h2v2h-2z','M18 18h2v2h-2z','M7 7h.01','M17 7h.01','M7 17h.01'],
+      link:['M9.5 13.5 14.5 8.5','M10.5 6.5l1.8-1.8a3.5 3.5 0 0 1 5 5l-1.8 1.8','M13.5 17.5l-1.8 1.8a3.5 3.5 0 0 1-5-5l1.8-1.8']
+    };
+    return this.svg(size,col,sw||1.9,(M[name]||[]));
+  },
+  qrGrid(seed,n){
+    n=n||21; let h=0; for(let i=0;i<seed.length;i++){h=(h*31+seed.charCodeAt(i))>>>0;}
+    let st=h||12345; const rnd=()=>{ st=(st*1103515245+12345)&0x7fffffff; return st/0x7fffffff; };
+    const finder=(r,c)=>{ const inB=(r<7&&c<7)||(r<7&&c>=n-7)||(r>=n-7&&c<7); if(!inB)return null; let lr=r,lc=c; if(c>=n-7)lc=c-(n-7); if(r>=n-7)lr=r-(n-7); const edge=(lr===0||lr===6||lc===0||lc===6); const core=(lr>=2&&lr<=4&&lc>=2&&lc<=4); return edge||core; };
+    let cells='';
+    for(let r=0;r<n;r++)for(let c=0;c<n;c++){ const f=finder(r,c); const on=f!==null?f:rnd()>0.52; cells+='<div style="background:'+(on?'#17181C':'transparent')+'"></div>'; }
+    return cells;
+  },
+  add(id){ const t=this.state.ticket; t[id]=(t[id]||0)+1; this.render(); },
+  remove(id){ const t=this.state.ticket; t[id]=(t[id]||0)-1; if(t[id]<=0)delete t[id]; this.render(); },
+  clear(){ this.state.ticket={}; this.render(); },
+  setQuery(v){ this.state.query=v; this.render(true); },
+  setCat(id){ this.state.cat=id; this.render(); },
+  toastMsg(m){ if(this._t)clearTimeout(this._t); this.state.toast=m; this.render(); this._t=setTimeout(()=>{this.state.toast=null;this.render();},1700); },
+  openPay(){ if(!Object.keys(this.state.ticket).length)return; Object.assign(this.state,{payOpen:true,payMethod:'efectivo',cashGiven:'',paySuccess:false}); this.render(); },
+  closePay(){ this.state.payOpen=false; this.render(); },
+  setMethod(m){ this.state.payMethod=m; this.render(); },
+  confirmPay(){ this.state.paySuccess=true; this.state.successMethod=this.state.payMethod; this.render(); },
+  newSale(){ Object.assign(this.state,{payOpen:false,paySuccess:false,ticket:{},cashGiven:'',ticketNumber:this.state.ticketNumber+1}); this.render(); },
+  cashKey(d){ let v=this.state.cashGiven; if(d==='del')v=v.slice(0,-1); else if(d==='c')v=''; else { if(v.replace(/\D/g,'').length<8)v=(v+d).replace(/^0+/,''); } this.state.cashGiven=v; this.render(); },
+  setCash(v){ this.state.cashGiven=String(v); this.render(); },
+
+  subtotal(){ return Object.keys(this.state.ticket).reduce((a,id)=>{const p=this.PRODUCTS.find(x=>x.id===Number(id));return a+p.price*this.state.ticket[id];},0); },
+
+  render(keepFocus){
+    const s=this.state;
+    document.getElementById('searchIcon').innerHTML=this.ui('search',20,'#9A9DA4');
+    document.getElementById('scanIcon').innerHTML=this.ui('scan',20,'#9A9DA4');
+    // cat chips
+    const allOn=!s.cat;
+    let chips='<div onclick="POS.setCat(null)" class="ptile" style="cursor:pointer;flex:none;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:700;background:'+(allOn?'#17181C':'#fff')+';color:'+(allOn?'#fff':'#17181C')+';border:1.5px solid '+(allOn?'#17181C':'#E6E3DD')+'">Todos</div>';
+    chips+=this.CATS.map(c=>{const on=s.cat===c.id;return '<div onclick="POS.setCat(\''+c.id+'\')" class="ptile" style="cursor:pointer;flex:none;padding:11px 18px;border-radius:999px;font-size:14px;font-weight:700;background:'+(on?'#17181C':'#fff')+';color:'+(on?'#fff':'#17181C')+';border:1.5px solid '+(on?'#17181C':'#E6E3DD')+'">'+this.esc(c.name)+'</div>';}).join('');
+    document.getElementById('catChips').innerHTML=chips;
+    // products
+    const norm=t=>t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+    let list=s.cat?this.PRODUCTS.filter(p=>p.cat===s.cat):this.PRODUCTS.slice();
+    const q=norm(s.query.trim()); if(q)list=list.filter(p=>norm(p.name).includes(q));
+    document.getElementById('prodGrid').innerHTML=list.map(p=>{const c=this.CATS.find(x=>x.id===p.cat);const qty=s.ticket[p.id]||0;
+      const badge=qty>0?'<div style="position:absolute;top:8px;right:8px;background:#E0202E;color:#fff;font-size:13px;font-weight:700;min-width:24px;height:24px;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:0 6px;font-family:\'Space Grotesk\',sans-serif">'+qty+'</div>':'';
+      return '<div onclick="POS.add('+p.id+')" class="ptile" style="cursor:pointer;background:#fff;border:1.5px solid '+(qty>0?'#E0202E':'#E6E3DD')+';border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:transform .08s;user-select:none"><div style="aspect-ratio:1.7/1;background:'+c.soft+';display:flex;align-items:center;justify-content:center;position:relative"><div style="transform:scale(1.15)">'+this.catIcon(p.cat,52)+'</div>'+badge+'</div><div style="padding:10px 12px 12px;flex:1;display:flex;flex-direction:column"><div style="font-size:13.5px;font-weight:600;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:34px">'+this.esc(p.name)+'</div><div style="font-size:11.5px;color:#9A9DA4;margin-top:2px">'+this.esc(p.unit)+'</div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:18px;margin-top:7px">'+this.format(p.price)+'</div></div></div>';
+    }).join('');
+    // ticket
+    const ids=Object.keys(s.ticket);
+    const itemCount=Object.values(s.ticket).reduce((a,b)=>a+b,0);
+    const hasItems=itemCount>0;
+    document.getElementById('ticketCount').textContent=hasItems?(itemCount+(itemCount===1?' ítem':' ítems')):'Sin productos';
+    document.getElementById('clearBtn').innerHTML=hasItems?'<div onclick="POS.clear()" class="ptile" style="cursor:pointer;display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:#E0202E;background:#FBECEE;padding:8px 14px;border-radius:999px">'+this.ui('trash',16,'#E0202E')+' Vaciar</div>':'';
+    if(!hasItems){
+      document.getElementById('ticketList').innerHTML='<div style="padding:90px 24px;text-align:center;color:#9A9DA4"><div style="width:74px;height:74px;border-radius:50%;background:#F5F4F1;display:flex;align-items:center;justify-content:center;margin:0 auto 16px">'+this.ui('cart',32,'#C9CCD2')+'</div><div style="font-size:15px;font-weight:700;color:#696D77">Ticket vacío</div><div style="font-size:13px;margin-top:4px">Tocá un producto para sumarlo</div></div>';
+    } else {
+      document.getElementById('ticketList').innerHTML=ids.map(id=>{const p=this.PRODUCTS.find(x=>x.id===Number(id));const c=this.CATS.find(k=>k.id===p.cat);const qty=s.ticket[id];
+        return '<div style="display:flex;align-items:center;gap:12px;padding:12px 6px;border-bottom:1px solid #F0EEEA"><div style="width:46px;height:46px;border-radius:11px;background:'+c.soft+';display:flex;align-items:center;justify-content:center;flex:none"><div style="transform:scale(.58)">'+this.catIcon(p.cat,52)+'</div></div><div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:600;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">'+this.esc(p.name)+'</div><div style="font-size:12px;color:#696D77;margin-top:2px">'+this.format(p.price)+' c/u</div></div><div style="display:flex;align-items:center;border:1.5px solid #E6E3DD;border-radius:999px;height:38px;flex:none"><button onclick="POS.remove('+p.id+')" class="pkey" style="width:36px;height:100%;border:none;background:transparent;color:#E0202E;font-size:20px;font-weight:700;cursor:pointer;border-radius:999px 0 0 999px">&minus;</button><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:15px;min-width:24px;text-align:center">'+qty+'</span><button onclick="POS.add('+p.id+')" class="pkey" style="width:36px;height:100%;border:none;background:transparent;color:#1B8A53;font-size:20px;font-weight:700;cursor:pointer;border-radius:0 999px 999px 0">+</button></div><div style="width:74px;text-align:right;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:14px;flex:none">'+this.format(p.price*qty)+'</div></div>';
+      }).join('');
+    }
+    const subtotal=this.subtotal();
+    document.getElementById('subtotal').textContent=this.format(subtotal);
+    document.getElementById('iva').textContent=this.format(subtotal*0.21/1.21);
+    document.getElementById('totalBig').textContent=this.format(subtotal);
+    const cb=document.getElementById('cobrarBtn');
+    cb.style.background=hasItems?'#E0202E':'#D6D4CE'; cb.style.cursor=hasItems?'pointer':'default'; cb.disabled=!hasItems;
+    cb.innerHTML=this.ui('check',20,'#fff')+' Cobrar '+this.format(subtotal);
+    // pay
+    this.renderPay(subtotal,itemCount,hasItems);
+    // toast
+    document.getElementById('toast').innerHTML=s.toast?'<div style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);background:#17181C;color:#fff;font-size:14px;font-weight:600;padding:13px 22px;border-radius:999px;display:flex;align-items:center;gap:9px;box-shadow:0 12px 36px rgba(0,0,0,.3);animation:ppop .2s ease;white-space:nowrap;z-index:50">'+this.ui('check',20,'#fff')+' '+this.esc(s.toast)+'</div>':'';
+    if(keepFocus){ const inp=document.getElementById('posSearch'); if(inp&&document.activeElement!==inp){} }
+  },
+
+  renderPay(subtotal,itemCount,hasItems){
+    const s=this.state;
+    if(!s.payOpen){ document.getElementById('payLayer').innerHTML=''; return; }
+    const countLabel=hasItems?(itemCount+(itemCount===1?' ítem':' ítems')):'Sin productos';
+    let inner;
+    if(s.paySuccess){
+      const cashNum=parseInt(s.cashGiven.replace(/\D/g,''),10)||0;
+      const vuelto=cashNum-subtotal;
+      const methodLabel=({efectivo:'Efectivo',tarjeta:'Tarjeta',qr:'QR Mercado Pago',link:'Link de pago'})[s.successMethod];
+      const vueltoRows=(s.successMethod==='efectivo'&&cashNum>0)?'<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:9px"><span style="color:#696D77">Pagó con</span><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700">'+this.format(cashNum)+'</span></div><div style="display:flex;justify-content:space-between;font-size:14px"><span style="color:#696D77">Vuelto</span><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;color:#1B8A53">'+this.format(Math.max(0,vuelto))+'</span></div>':'';
+      inner='<div style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;animation:ppop .3s ease"><div style="width:104px;height:104px;border-radius:50%;background:#EAF5EE;display:flex;align-items:center;justify-content:center;margin-bottom:20px">'+this.ui('check',42,'#1B8A53',2.4)+'</div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:30px">Venta cobrada</div><div style="font-size:15px;color:#696D77;margin-top:6px">'+methodLabel+' · '+countLabel+'</div><div style="background:#F5F4F1;border-radius:16px;padding:20px 24px;margin-top:24px;width:360px;text-align:left"><div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:9px"><span style="color:#696D77">Total cobrado</span><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:16px">'+this.format(subtotal)+'</span></div>'+vueltoRows+'<div style="display:flex;justify-content:space-between;font-size:12.5px;color:#9A9DA4;margin-top:12px;padding-top:12px;border-top:1px dashed #D6D4CE"><span>Ticket #'+s.ticketNumber+'</span><span>22/06/2026 · 14:32</span></div></div><div style="display:flex;gap:12px;margin-top:24px"><div onclick="POS.toastMsg(\'Enviando ticket a la impresora...\')" class="ptile" style="cursor:pointer;background:#fff;border:1px solid #E6E3DD;font-weight:700;font-size:15px;padding:15px 26px;border-radius:13px">Imprimir ticket</div><div onclick="POS.newSale()" class="ptile" style="cursor:pointer;background:#E0202E;color:#fff;font-weight:700;font-size:15px;padding:15px 32px;border-radius:13px">Nueva venta</div></div></div>';
+    } else {
+      const methodDefs=[{id:'efectivo',label:'Efectivo',icon:'cash'},{id:'tarjeta',label:'Tarjeta',icon:'card'},{id:'qr',label:'QR Mercado Pago',icon:'qr'},{id:'link',label:'Link de pago',icon:'link'}];
+      const methods=methodDefs.map(m=>{const a=s.payMethod===m.id;return '<div onclick="POS.setMethod(\''+m.id+'\')" class="ptile" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 15px;border-radius:13px;border:1.5px solid '+(a?'#E0202E':'#E6E3DD')+';background:'+(a?'#FBECEE':'#fff')+'"><span style="flex:none;display:flex">'+this.ui(m.icon,20,a?'#E0202E':'#696D77')+'</span><span style="font-size:14.5px;font-weight:700;color:'+(a?'#E0202E':'#17181C')+'">'+m.label+'</span></div>';}).join('');
+      const cashNum=parseInt(s.cashGiven.replace(/\D/g,''),10)||0;
+      const vuelto=cashNum-subtotal;
+      const round=v=>Math.ceil(subtotal/v)*v;
+      const chipVals=[subtotal,round(1000),round(5000),Math.max(round(10000),20000)].filter((v,i,arr)=>v>0&&arr.indexOf(v)===i).slice(0,4);
+      const cashChips=chipVals.map(v=>{const on=cashNum===v;return '<div onclick="POS.setCash('+v+')" class="ptile" style="cursor:pointer;padding:10px 16px;border-radius:999px;font-size:14px;font-weight:700;font-family:\'Space Grotesk\',sans-serif;background:'+(on?'#17181C':'#fff')+';color:'+(on?'#fff':'#17181C')+';border:1.5px solid '+(on?'#17181C':'#E6E3DD')+'">'+(v===subtotal?'Justo':this.format(v))+'</div>';}).join('');
+      const keypad=['1','2','3','4','5','6','7','8','9','c','0','del'].map(d=>{const lbl=d==='del'?'⌫':d==='c'?'C':d;const bg=(d==='c'||d==='del')?'#F5F4F1':'#fff';const col=d==='c'?'#D12027':'#17181C';return '<div onclick="POS.cashKey(\''+d+'\')" class="pkey" style="cursor:pointer;border-radius:13px;background:'+bg+';display:flex;align-items:center;justify-content:center;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:22px;color:'+col+';border:1px solid #E6E3DD;min-height:62px">'+lbl+'</div>';}).join('');
+      let methodView='';
+      if(s.payMethod==='efectivo'){
+        methodView='<div style="display:flex;gap:26px;height:100%"><div style="flex:1;display:flex;flex-direction:column"><div style="font-size:13px;font-weight:700;color:#696D77">Paga con</div><div style="background:#F5F4F1;border-radius:14px;height:64px;display:flex;align-items:center;padding:0 18px;margin-top:8px"><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:30px;color:'+(cashNum>0?'#17181C':'#C9CCD2')+'">'+(cashNum>0?this.format(cashNum):'$0')+'</span></div><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">'+cashChips+'</div><div style="flex:1"></div><div style="display:flex;justify-content:space-between;align-items:baseline;background:'+(vuelto<0?'#FBECEE':'#EAF5EE')+';border-radius:14px;padding:16px 18px;margin-top:14px"><span style="font-size:15px;font-weight:700;color:'+(vuelto<0?'#D12027':'#1B8A53')+'">'+(vuelto<0?'Falta':'Vuelto')+'</span><span style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:28px;color:'+(vuelto<0?'#D12027':'#1B8A53')+'">'+this.format(Math.abs(vuelto))+'</span></div></div><div style="width:230px;flex:none;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:9px">'+keypad+'</div></div>';
+      } else if(s.payMethod==='tarjeta'){
+        methodView='<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center"><div style="width:96px;height:96px;border-radius:50%;background:#E9F1FE;display:flex;align-items:center;justify-content:center;margin-bottom:18px">'+this.ui('card',40,'#2D7FF0')+'</div><div style="font-size:18px;font-weight:700">Insertá, deslizá o acercá la tarjeta</div><div style="font-size:14px;color:#696D77;margin-top:6px">Terminal Posnet conectada · débito y crédito</div><div style="display:flex;align-items:center;gap:8px;margin-top:18px;color:#696D77;font-size:13px"><span style="width:9px;height:9px;border-radius:50%;background:#2563EB;animation:ppulse 1.4s infinite"></span>Esperando la terminal...</div></div>';
+      } else if(s.payMethod==='qr'){
+        methodView='<div style="height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center"><div style="background:#2563EB;color:#fff;font-size:13px;font-weight:700;padding:6px 14px;border-radius:999px;margin-bottom:14px">Mercado Pago</div><div style="background:#fff;border:1px solid #E6E3DD;border-radius:16px;padding:14px"><div style="display:grid;grid-template-columns:repeat(21,1fr);width:188px;height:188px">'+this.qrGrid('mp-'+subtotal+'-'+s.ticketNumber,21)+'</div></div><div style="font-size:14px;color:#696D77;margin-top:14px;display:flex;align-items:center;gap:8px"><span style="width:9px;height:9px;border-radius:50%;background:#E08600;animation:ppulse 1.4s infinite"></span>Escaneá para pagar '+this.format(subtotal)+'</div></div>';
+      } else {
+        methodView='<div style="height:100%;display:flex;flex-direction:column;justify-content:center;max-width:440px;margin:0 auto"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:20px">Enviá un link de pago</div><div style="font-size:14px;color:#696D77;margin:6px 0 18px">El cliente paga desde su celular por '+this.format(subtotal)+'.</div><div style="display:flex;align-items:center;gap:10px;background:#F5F4F1;border:1px solid #E6E3DD;border-radius:12px;padding:14px 16px"><span style="flex:1;font-size:14px;font-family:\'Space Grotesk\',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">launion.com.ar/pagar/'+s.ticketNumber+'</span><div onclick="POS.toastMsg(\'Link copiado\')" class="ptile" style="cursor:pointer;background:#17181C;color:#fff;font-size:13px;font-weight:700;padding:10px 16px;border-radius:10px;flex:none">Copiar</div></div><div style="display:flex;gap:10px;margin-top:14px"><div class="ptile" style="flex:1;text-align:center;background:#1FA84A;color:#fff;font-weight:700;font-size:14px;padding:14px;border-radius:12px;cursor:pointer">WhatsApp</div><div class="ptile" style="flex:1;text-align:center;background:#fff;border:1px solid #E6E3DD;font-weight:700;font-size:14px;padding:14px;border-radius:12px;cursor:pointer">Email</div></div></div>';
+      }
+      const confirmReady=s.payMethod!=='efectivo'||(cashNum>0&&vuelto>=0);
+      const confirmLabel=s.payMethod==='efectivo'?'Confirmar cobro en efectivo':s.payMethod==='tarjeta'?'Confirmar pago con tarjeta':s.payMethod==='qr'?'Confirmar pago QR':'Marcar como pagado';
+      inner='<div style="display:flex;width:100%"><div style="width:280px;flex:none;background:#F5F4F1;border-right:1px solid #E6E3DD;padding:22px 18px;display:flex;flex-direction:column"><div style="font-size:13px;color:#696D77;font-weight:600">Total a cobrar</div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:38px;margin-top:4px">'+this.format(subtotal)+'</div><div style="font-size:12.5px;color:#9A9DA4;margin-top:2px">'+countLabel+'</div><div style="font-size:12px;font-weight:700;color:#9A9DA4;letter-spacing:.06em;margin:22px 0 10px">MÉTODO DE PAGO</div><div style="display:flex;flex-direction:column;gap:9px">'+methods+'</div><div style="flex:1"></div><div onclick="POS.closePay()" class="ptile" style="cursor:pointer;text-align:center;padding:13px;border-radius:12px;background:#fff;border:1px solid #E6E3DD;font-size:14px;font-weight:700">Cancelar</div></div><div style="flex:1;display:flex;flex-direction:column;min-width:0"><div class="pscroll" style="flex:1;overflow-y:auto;padding:24px 26px">'+methodView+'</div><div style="flex:none;border-top:1px solid #E6E3DD;padding:16px 26px"><button onclick="POS.confirmPay()" '+(confirmReady?'':'disabled')+' class="ptile" style="width:100%;height:58px;border:none;border-radius:14px;font-weight:700;font-size:17px;cursor:'+(confirmReady?'pointer':'default')+';background:'+(confirmReady?'#1B8A53':'#D6D4CE')+';color:#fff">'+confirmLabel+'</button></div></div></div>';
+    }
+    document.getElementById('payLayer').innerHTML='<div onclick="POS.closePay()" style="position:absolute;inset:0;background:rgba(14,15,18,.55);display:flex;align-items:center;justify-content:center;z-index:40;animation:pfade .15s ease"><div onclick="event.stopPropagation()" style="width:880px;max-width:calc(100% - 48px);height:560px;max-height:calc(100% - 48px);background:#fff;border-radius:22px;overflow:hidden;animation:ppop .22s ease;display:flex">'+inner+'</div></div>';
+  },
+
+  fit(){ const el=document.getElementById('fit'); const W=1180,H=820; const s=Math.min(1,(window.innerWidth-40)/W,(window.innerHeight-40)/H); el.style.transform='scale('+s+')'; }
+};
+window.addEventListener('resize',()=>POS.fit());
+POS.fit(); POS.render();
+</script>
+</body>
+</html>
