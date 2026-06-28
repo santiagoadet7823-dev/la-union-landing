@@ -51,6 +51,23 @@ const G={
     {id:'panaderia',name:'Panadería',color:'#C46A2B',soft:'#F5ECE3'},
     {id:'congelados',name:'Congelados',color:'#3FA9D6',soft:'#E6F3FA'}
   ],
+  // [góndola, depósito, distribuidora, precio venta, precio mayorista]
+  PRODUCTS:[
+    {cat:'lacteos',name:'Leche Entera La Serenísima',unit:'Sachet 1 L',g:14,d:60,t:320,pv:990,pm:760},
+    {cat:'lacteos',name:'Manteca La Paulina',unit:'200 g',g:6,d:18,t:90,pv:1850,pm:1480},
+    {cat:'almacen',name:'Yerba Mate Playadito',unit:'1 kg',g:12,d:80,t:420,pv:3990,pm:3150},
+    {cat:'almacen',name:'Café La Virginia',unit:'250 g',g:0,d:4,t:60,pv:4290,pm:3490},
+    {cat:'almacen',name:'Aceite de Girasol Natura',unit:'900 ml',g:5,d:40,t:240,pv:2990,pm:2390},
+    {cat:'almacen',name:'Fideos Tirabuzón Matarazzo',unit:'500 g',g:22,d:120,t:600,pv:990,pm:760},
+    {cat:'bebidas',name:'Coca-Cola Original',unit:'2,25 L',g:18,d:96,t:480,pv:2890,pm:2350},
+    {cat:'bebidas',name:'Cerveza Quilmes Clásica',unit:'Litro',g:9,d:48,t:360,pv:1690,pm:1340},
+    {cat:'carnes',name:'Asado de Tira',unit:'Por kg',g:4,d:25,t:0,pv:9990,pm:8200},
+    {cat:'carnes',name:'Pechuga de Pollo',unit:'Por kg',g:11,d:30,t:0,pv:5490,pm:4600},
+    {cat:'limpieza',name:'Detergente Magistral',unit:'750 ml',g:3,d:22,t:180,pv:1990,pm:1590},
+    {cat:'limpieza',name:'Papel Higiénico Higienol x4',unit:'4 rollos',g:7,d:35,t:200,pv:2990,pm:2390},
+    {cat:'congelados',name:'Helado Crema Americana',unit:'1 kg',g:2,d:10,t:40,pv:5990,pm:4900},
+    {cat:'frutas',name:'Banana Ecuador',unit:'Por kg',g:16,d:40,t:0,pv:1490,pm:1100}
+  ],
   svg(size,color,sw,paths){ return '<svg width="'+size+'" height="'+size+'" viewBox="0 0 24 24" fill="none" stroke="'+color+'" stroke-width="'+(sw||1.85)+'" stroke-linecap="round" stroke-linejoin="round">'+paths.map(d=>'<path d="'+d+'"/>').join('')+'</svg>'; },
   catIcon(id,size){
     const c=this.CATS.find(x=>x.id===id); const col=c?c.color:'#696D77';
@@ -78,7 +95,7 @@ const G={
     return this.svg(size,col,sw||1.9,(M[name]||[]));
   },
   toastMsg(m){ if(this._t)clearTimeout(this._t); this.state.toast=m; this.renderToast(); this._t=setTimeout(()=>{this.state.toast=null;this.renderToast();},1900); },
-  go(id){ if(id==='pos'){ window.location.href='pos.html'; return; } this.state.mod=id; this.render(); if(id!=='dashboard'){ this.toastMsg(this.modName(id)+' — módulo de demostración'); } },
+  go(id){ if(id==='pos'){ window.location.href='pos.html'; return; } this.state.mod=id; this.render(); if(id!=='dashboard'&&id!=='inventario'){ this.toastMsg(this.modName(id)+' — módulo de demostración'); } },
   modName(id){ return ({dashboard:'Dashboard',pos:'Caja',cobros:'Cobros web',catalogo:'Catálogo',inventario:'Inventario',compras:'Compras',clientes:'Clientes',finanzas:'Finanzas',empleados:'Empleados',configuracion:'Configuración'})[id]||id; },
 
   renderNav(){
@@ -126,6 +143,41 @@ const G={
     '</div>';
   },
 
+  fmt(n){ return '$'+Math.round(n).toLocaleString('es-AR'); },
+  inventario(){
+    const rows=this.PRODUCTS.map(p=>{
+      let state,col,bg,label;
+      if(p.g===0){ state='quiebre'; col='#D12027'; bg='#FBECEE'; label='Quiebre en góndola'; }
+      else if(p.g<=6){ state='bajo'; col='#E08600'; bg='#FFF6E6'; label='Reponer góndola'; }
+      else { state='ok'; col='#1B8A53'; bg='#EAF5EE'; label='OK'; }
+      const c=this.CATS.find(x=>x.id===p.cat);
+      const cell=(v,strong)=>'<td style="padding:13px 12px;text-align:center;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:14px;color:'+(strong||'#17181C')+'">'+(v===0?'<span style="color:#C9CCD2">0</span>':v)+'</td>';
+      return '<tr style="border-top:1px solid #F0EEEA">'+
+        '<td style="padding:11px 12px;min-width:230px"><div style="display:flex;align-items:center;gap:11px"><div style="width:34px;height:34px;border-radius:9px;background:'+c.soft+';display:flex;align-items:center;justify-content:center;flex:none"><div style="transform:scale(.6)">'+this.catIcon(p.cat,40)+'</div></div><div><div style="font-size:13.5px;font-weight:600">'+p.name+'</div><div style="font-size:11.5px;color:#9A9DA4">'+p.unit+' · '+c.name+'</div></div></div></td>'+
+        cell(p.g,state==='quiebre'?'#D12027':state==='bajo'?'#E08600':'#17181C')+
+        cell(p.d)+
+        cell(p.t)+
+        '<td style="padding:11px 12px;text-align:right;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:13.5px">'+this.fmt(p.pv)+'</td>'+
+        '<td style="padding:11px 12px;text-align:right;font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:13.5px;color:#696D77">'+(p.pm?this.fmt(p.pm):'—')+'</td>'+
+        '<td style="padding:11px 12px;text-align:center"><span style="display:inline-block;background:'+bg+';color:'+col+';font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:999px;white-space:nowrap">'+label+'</span></td>'+
+      '</tr>';
+    }).join('');
+    const quiebre=this.PRODUCTS.filter(p=>p.g===0).length;
+    const bajo=this.PRODUCTS.filter(p=>p.g>0&&p.g<=6).length;
+    const th=(t,extra)=>'<th style="padding:11px 12px;font-size:11px;font-weight:700;letter-spacing:.05em;color:#9A9DA4;text-transform:uppercase;'+(extra||'')+'">'+t+'</th>';
+    return '<div style="padding:26px 30px 60px;max-width:1180px">'+
+      '<div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px"><div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px">Inventario</div><div style="font-size:13.5px;color:#696D77;margin-top:3px">Stock separado por ubicación · Sucursal Las Lajitas</div></div><div onclick="G.toastMsg(\'Generando pedido de reposición...\')" style="cursor:pointer;display:flex;align-items:center;gap:8px;background:#E0202E;color:#fff;font-weight:700;font-size:14px;padding:11px 18px;border-radius:11px">'+this.ui('truck',18,'#fff')+' Reponer góndola</div></div>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px">'+
+        '<div style="background:#fff;border:1px solid #E6E3DD;border-radius:14px;padding:16px"><div style="font-size:12.5px;color:#696D77;font-weight:600">Productos</div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:24px;margin-top:4px">'+this.PRODUCTS.length+'</div></div>'+
+        '<div style="background:#fff;border:1px solid #F2DFB0;border-radius:14px;padding:16px"><div style="font-size:12.5px;color:#E08600;font-weight:700">A reponer en góndola</div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:24px;margin-top:4px;color:#E08600">'+bajo+'</div></div>'+
+        '<div style="background:#fff;border:1px solid #F3C2C6;border-radius:14px;padding:16px"><div style="font-size:12.5px;color:#D12027;font-weight:700">En quiebre (góndola 0)</div><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:24px;margin-top:4px;color:#D12027">'+quiebre+'</div></div>'+
+      '</div>'+
+      '<div style="background:#fff;border:1px solid #E6E3DD;border-radius:16px;overflow:hidden"><div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:760px"><thead><tr style="background:#FAF9F7">'+
+        th('Producto','text-align:left')+th('Góndola')+th('Depósito')+th('Distribuidora')+th('P. venta','text-align:right')+th('P. mayorista','text-align:right')+th('Estado')+
+      '</tr></thead><tbody>'+rows+'</tbody></table></div></div>'+
+      '<div style="display:flex;gap:14px;margin-top:14px;font-size:12.5px;color:#696D77;flex-wrap:wrap"><span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:#1B8A53"></span>OK</span><span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:#E08600"></span>Reponer góndola (≤6)</span><span style="display:flex;align-items:center;gap:6px"><span style="width:9px;height:9px;border-radius:50%;background:#D12027"></span>Quiebre (góndola 0)</span></div>'+
+    '</div>';
+  },
   placeholder(id){
     return '<div style="padding:26px 30px;max-width:1180px"><div style="font-family:\'Space Grotesk\',sans-serif;font-weight:700;font-size:26px;margin-bottom:6px">'+this.modName(id)+'</div><div style="font-size:13.5px;color:#696D77;margin-bottom:24px">Módulo del sistema de gestión</div><div style="background:#fff;border:1px dashed #D6D4CE;border-radius:18px;padding:70px 40px;text-align:center"><div style="width:64px;height:64px;border-radius:16px;background:#FBECEE;display:flex;align-items:center;justify-content:center;margin:0 auto 18px">'+this.ui('gear',30,'#E0202E')+'</div><div style="font-size:17px;font-weight:700">Vista de demostración</div><div style="font-size:14px;color:#696D77;margin-top:8px;max-width:420px;margin-left:auto;margin-right:auto">Este módulo forma parte del diseño completo de La Unión Gestión. El <b>Dashboard</b> está implementado y navegable. Los demás módulos se desarrollan a pedido.</div><div onclick="G.go(\'dashboard\')" style="cursor:pointer;display:inline-block;margin-top:22px;background:#E0202E;color:#fff;font-weight:700;font-size:14px;padding:12px 24px;border-radius:11px">Volver al dashboard</div></div></div>';
   },
@@ -139,7 +191,8 @@ const G={
   },
   render(){
     this.renderNav();
-    document.getElementById('main').innerHTML=this.state.mod==='dashboard'?this.dashboard():this.placeholder(this.state.mod);
+    const m=this.state.mod;
+    document.getElementById('main').innerHTML=m==='dashboard'?this.dashboard():m==='inventario'?this.inventario():this.placeholder(m);
     document.getElementById('main').scrollTop=0;
     this.renderToast();
   }
