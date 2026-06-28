@@ -60,9 +60,38 @@
   .btn{display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:15px;padding:13px 22px;border-radius:999px}
   .btn-wa{background:#1FA84A;color:#fff}
   .btn-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.2)}
+  /* sistema integrado */
+  .band{background:#fff;border:1px solid #E6E3DD;border-radius:24px;padding:32px;margin:18px 0}
+  .band .lead{color:#696D77;font-size:1rem;max-width:64ch;margin-top:6px}
+  .flow{display:flex;align-items:stretch;gap:0;margin:24px 0 8px;flex-wrap:wrap}
+  .fstep{flex:1;min-width:150px;background:#F5F4F1;border:1px solid #E6E3DD;border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px}
+  .fstep .fi{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+  .fstep h5{font-family:'Space Grotesk',sans-serif;font-size:1rem;margin:2px 0 0}
+  .fstep p{font-size:.82rem;color:#696D77}
+  .farrow{display:flex;align-items:center;justify-content:center;color:#C9CCD2;font-size:24px;padding:0 6px;flex:none}
+  .stock3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+  .sc{border-radius:18px;padding:22px;position:relative;overflow:hidden;min-height:160px;display:flex;flex-direction:column;justify-content:space-between;color:#fff}
+  .sc .si{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center}
+  .sc h4{font-family:'Space Grotesk',sans-serif;font-size:1.2rem;margin-bottom:4px}
+  .sc p{font-size:.86rem;opacity:.92}
+  .note{display:flex;gap:14px;background:#FFF6E6;border:1px solid #F2DFB0;border-radius:14px;padding:16px 18px;margin-top:18px}
+  .note h4{font-size:.98rem;margin-bottom:3px;color:#7A5A12}
+  .note p{font-size:.86rem;color:#8a6a22}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px}
+  .pcardb{background:#fff;border:1px solid #E6E3DD;border-radius:18px;padding:24px}
+  .pcardb h3{font-family:'Space Grotesk',sans-serif;font-size:1.15rem;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+  .pcardb ul{list-style:none;padding:0;margin:12px 0 0}
+  .pcardb li{display:flex;gap:10px;padding:8px 0;font-size:.92rem;color:#3a3b40;border-top:1px solid #F0EEEA}
+  .pcardb li:first-child{border-top:0}
+  .tick{flex:none;width:20px;height:20px;border-radius:50%;background:#EAF5EE;display:flex;align-items:center;justify-content:center;margin-top:1px}
+  .road{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:8px}
+  .ritem{display:flex;gap:14px;background:#fff;border:1px solid #E6E3DD;border-radius:14px;padding:18px}
+  .rnum{flex:none;width:30px;height:30px;border-radius:9px;background:#FBECEE;color:#E0202E;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+  .ritem h4{font-size:.98rem;margin-bottom:3px}
+  .ritem p{font-size:.85rem;color:#696D77}
   footer{padding:30px 0 50px;text-align:center;color:#9A9DA4;font-size:13px}
   footer a{color:#696D77;font-weight:600}
-  @media(max-width:880px){.demos{grid-template-columns:1fr}.feat{grid-template-columns:repeat(2,1fr)}.contact{flex-direction:column;text-align:center}.contact .actions{margin:0 auto}}
+  @media(max-width:880px){.demos{grid-template-columns:1fr}.feat{grid-template-columns:repeat(2,1fr)}.contact{flex-direction:column;text-align:center}.contact .actions{margin:0 auto}.stock3{grid-template-columns:1fr}.two{grid-template-columns:1fr}.road{grid-template-columns:1fr}.farrow{transform:rotate(90deg)}}
 </style>
 </head>
 <body>
@@ -121,6 +150,79 @@
     <div class="fcard"><div class="ic" style="background:#E9F1FE"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2D7FF0" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.2a6.8 6.8 0 1 0 0 13.6 6.8 6.8 0 0 0 0-13.6z"/><path d="M20.4 20.4 16 16"/></svg></div><h4>Búsqueda y filtros</h4><p>Buscador, orden por precio y filtro de ofertas que funcionan de verdad.</p></div>
     <div class="fcard"><div class="ic" style="background:#EAF5EE"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B8A53" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6.5h18a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1z"/><path d="M2 10h20"/></svg></div><h4>Cobros múltiples</h4><p>Efectivo, tarjeta, QR Mercado Pago y link de pago en la caja.</p></div>
     <div class="fcard"><div class="ic" style="background:#F8F0E2"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C98A2B" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V9"/><path d="M9 19V5"/><path d="M14 19v-8"/><path d="M19 19V7"/></svg></div><h4>Métricas del negocio</h4><p>KPIs, ventas semanales, ranking de productos y alertas de stock.</p></div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-h"><div><h2>Un solo sistema, todo conectado</h2></div><p>La info no se carga dos veces</p></div>
+  <div class="band">
+    <p class="lead">Tienda, caja y gestión trabajan sobre la <b>misma base de datos</b>. Una venta en la caja descuenta el stock, actualiza los reportes y refleja el precio al instante. Cargás un producto o cambiás un precio <b>una sola vez</b> y se ve en todos lados.</p>
+    <div class="flow">
+      <div class="fstep"><div class="fi" style="background:#FBECEE">🚚</div><h5>Distribuidora</h5><p>Compra mayorista. Ingresa mercadería al sistema.</p></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><div class="fi" style="background:#F8F0E2">🏬</div><h5>Depósito</h5><p>Stock guardado. Repone la góndola cuando baja.</p></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><div class="fi" style="background:#EAF5EE">🛒</div><h5>Góndola</h5><p>Lo que está a la venta en el salón.</p></div>
+      <div class="farrow">→</div>
+      <div class="fstep"><div class="fi" style="background:#E9F1FE">💳</div><h5>Caja / Tienda</h5><p>Se vende y descuenta de góndola automáticamente.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-h"><div><h2>Stock separado por ubicación</h2></div><p>Sabés qué hay en cada lugar</p></div>
+  <div class="stock3">
+    <div class="sc" style="background:linear-gradient(135deg,#1B8A53,#0f6e3f)">
+      <div class="si">🛒</div>
+      <div><h4>Góndola</h4><p>Lo que el cliente puede comprar hoy. Cada venta lo descuenta y, al llegar al mínimo, salta una <b>alerta de reposición</b>.</p></div>
+    </div>
+    <div class="sc" style="background:linear-gradient(135deg,#C98A2B,#a06c1e)">
+      <div class="si">🏬</div>
+      <div><h4>Depósito</h4><p>El respaldo del local. Cuando la góndola baja, se repone desde acá y el sistema lo registra.</p></div>
+    </div>
+    <div class="sc" style="background:linear-gradient(135deg,#E0202E,#b81824)">
+      <div class="si">🚚</div>
+      <div><h4>Distribuidora</h4><p>Stock mayorista para vender a otros negocios. Se controla aparte del super, con sus propios precios.</p></div>
+    </div>
+  </div>
+  <div class="note"><div style="font-size:22px">📦</div><div><h4>Tres stocks, un mismo producto</h4><p>La misma yerba puede tener 12 unidades en góndola, 80 en depósito y 400 en distribuidora. El sistema los maneja por separado pero los muestra juntos.</p></div></div>
+</section>
+
+<section class="wrap">
+  <div class="section-h"><div><h2>Precios y reportes</h2></div><p>Listas de precios siempre al día</p></div>
+  <div class="two">
+    <div class="pcardb">
+      <h3><span style="width:34px;height:34px;border-radius:9px;background:#E9F1FE;display:flex;align-items:center;justify-content:center">📋</span> Reportes y listas de precios</h3>
+      <ul>
+        <li><span class="tick">✓</span> Lista de precios de <b>góndola</b> (venta al público) y de <b>distribuidora</b> (mayorista), por separado.</li>
+        <li><span class="tick">✓</span> Exportá la lista para imprimir o enviar por WhatsApp/PDF a tus clientes.</li>
+        <li><span class="tick">✓</span> Reportes de ventas, productos más vendidos, margen y stock por ubicación.</li>
+        <li><span class="tick">✓</span> Historial de cambios de precio para saber qué subió y cuándo.</li>
+      </ul>
+    </div>
+    <div class="pcardb">
+      <h3><span style="width:34px;height:34px;border-radius:9px;background:#FBECEE;display:flex;align-items:center;justify-content:center">🔔</span> Actualización y alertas en góndola</h3>
+      <ul>
+        <li><span class="tick">✓</span> El sistema marca <b>qué precios hay que actualizar en góndola</b> cuando cambia el costo de compra.</li>
+        <li><span class="tick">✓</span> Genera el cartel/etiqueta nuevo para reemplazar el de la góndola.</li>
+        <li><span class="tick">✓</span> <b>Alerta de stock bajo en góndola</b>: avisa qué reponer desde el depósito.</li>
+        <li><span class="tick">✓</span> Alerta de quiebre (stock cero) para no perder ventas.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="section-h"><div><h2>Mejoras que propongo</h2></div><p>Para sumar en próximas etapas</p></div>
+  <div class="road">
+    <div class="ritem"><div class="rnum">1</div><div><h4>Reposición automática sugerida</h4><p>Cuando la góndola baja del mínimo, el sistema arma solo la lista de lo que hay que bajar del depósito — y el pedido a la distribuidora si el depósito también está corto.</p></div></div>
+    <div class="ritem"><div class="rnum">2</div><div><h4>Lector de código de barras y balanza</h4><p>Cargar y cobrar productos escaneando, y pesar frutas/verduras/fiambres integrado a la caja.</p></div></div>
+    <div class="ritem"><div class="rnum">3</div><div><h4>Cuenta corriente de distribuidora</h4><p>Clientes mayoristas con saldo, pedidos, remitos y lista de precios propia. Pedidos por WhatsApp.</p></div></div>
+    <div class="ritem"><div class="rnum">4</div><div><h4>Control de vencimientos y lotes</h4><p>Avisos de productos próximos a vencer para rotarlos o rematarlos antes de perderlos.</p></div></div>
+    <div class="ritem"><div class="rnum">5</div><div><h4>Facturación electrónica (AFIP)</h4><p>Emitir factura/ticket fiscal directo desde la caja, sin doble carga.</p></div></div>
+    <div class="ritem"><div class="rnum">6</div><div><h4>Multisucursal y acceso remoto</h4><p>Ver ventas y stock de cada local desde el celular, con datos respaldados en la nube.</p></div></div>
+    <div class="ritem"><div class="rnum">7</div><div><h4>Promos y Club con puntos</h4><p>Cupones, 2x1 y puntos por compra para fidelizar, todo atado al cliente.</p></div></div>
+    <div class="ritem"><div class="rnum">8</div><div><h4>Cambio de precios masivo</h4><p>Subir un % a toda una categoría o proveedor de una vez, con vista previa antes de aplicar.</p></div></div>
   </div>
 </section>
 
