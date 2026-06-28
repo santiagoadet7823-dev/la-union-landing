@@ -19,6 +19,25 @@
   [data-hover-row]:hover{background:#F5F4F1!important}
   .pcard:hover{box-shadow:0 8px 24px rgba(23,24,28,.12)}
   .pcard{transition:box-shadow .15s}
+  /* --- Responsive móvil: las grillas usan estilos inline, se sobreescriben con !important --- */
+  @media(max-width:760px){
+    #root [style*="repeat(8,1fr)"]{grid-template-columns:repeat(4,1fr)!important;gap:10px!important}
+    #root [style*="repeat(5,1fr)"]{grid-template-columns:repeat(2,1fr)!important}
+    #root [style*="repeat(4,1fr)"]{grid-template-columns:repeat(2,1fr)!important}
+    #root [style*="grid-template-columns:1.62fr 1fr"]{grid-template-columns:1fr!important}
+    #root [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+    #root [style*="grid-template-columns:230px 1fr"]{grid-template-columns:1fr!important}
+    #root [style*="grid-template-columns:380px 1fr"]{grid-template-columns:1fr!important}
+    #root [style*="grid-template-columns:1fr 360px"]{grid-template-columns:1fr!important}
+    /* header: que envuelva y el buscador ocupe toda la fila */
+    #root [style*="gap:28px"]{flex-wrap:wrap!important;gap:12px!important}
+    #root [style*="height:48px"][style*="flex:1"]{order:5;flex-basis:100%!important;min-width:0!important}
+    /* desactivar sticky lateral en columnas que ya se apilaron */
+    #root [style*="position:sticky"][style*="top:170px"]{position:static!important}
+  }
+  @media(max-width:430px){
+    #root [style*="repeat(8,1fr)"]{grid-template-columns:repeat(3,1fr)!important}
+  }
 </style>
 </head>
 <body>

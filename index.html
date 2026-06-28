@@ -103,9 +103,25 @@
   .cta h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.7rem,4vw,2.4rem);margin-bottom:12px;position:relative}
   .cta p{opacity:.92;max-width:52ch;margin:0 auto 26px;font-size:1.05rem;position:relative}
   .cta .btn-wa{background:#fff;color:#E0202E;font-size:1.05rem;padding:15px 30px;position:relative}
+  .pay{background:#17181C;color:#fff;border-radius:24px;padding:40px;margin:18px 0;position:relative;overflow:hidden}
+  .pay .pblob{position:absolute;border-radius:50%;background:rgba(37,99,235,.18)}
+  .pay .badge{display:inline-flex;align-items:center;gap:7px;background:#2563EB;color:#fff;font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:999px;position:relative}
+  .pay h2{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.5rem,4vw,2.1rem);margin:16px 0 10px;position:relative}
+  .pay .sub{color:rgba(255,255,255,.78);max-width:62ch;font-size:1.05rem;position:relative}
+  .payg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px;position:relative}
+  .payc{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px}
+  .payc .pi{font-size:24px;line-height:1}
+  .payc h4{font-size:1.02rem;margin:10px 0 4px}
+  .payc p{font-size:.87rem;color:rgba(255,255,255,.72)}
   footer{padding:30px 0 50px;text-align:center;color:#9A9DA4;font-size:13px}
   footer a{color:#696D77;font-weight:600}
-  @media(max-width:880px){.demos{grid-template-columns:1fr}.feat{grid-template-columns:repeat(2,1fr)}.contact{flex-direction:column;text-align:center}.contact .actions{margin:0 auto}.stock3{grid-template-columns:1fr}.two{grid-template-columns:1fr}.road{grid-template-columns:1fr}.farrow{transform:rotate(90deg)}.benefits{grid-template-columns:repeat(2,1fr)}.cta{padding:38px 24px}}
+  @media(max-width:880px){.demos{grid-template-columns:1fr}.feat{grid-template-columns:repeat(2,1fr)}.contact{flex-direction:column;text-align:center}.contact .actions{margin:0 auto}.stock3{grid-template-columns:1fr}.two{grid-template-columns:1fr}.road{grid-template-columns:1fr}.payg{grid-template-columns:1fr}.pay{padding:30px 24px}.benefits{grid-template-columns:repeat(2,1fr)}.cta{padding:38px 24px}
+    .flow{flex-direction:column}.fstep{min-width:0;width:100%}.farrow{transform:rotate(90deg);padding:6px 0}
+    .demos,.feat,.benefits,.stock3,.two,.road,.flow{min-width:0}
+    .demo,.fcard,.bcard,.sc,.ritem,.pcardb,.fstep,.contact{min-width:0}
+    .pcardb h3{flex-wrap:wrap}
+    .pcardb li,.pcardb p,.bcard p,.ritem p,.demo .body p,.fcard p,.sc p,.hero p{overflow-wrap:anywhere}}
+  @media(max-width:560px){.benefits{grid-template-columns:1fr}.nav .wa{padding:9px 14px}.hero{padding:40px 0 24px}}
 </style>
 </head>
 <body>
@@ -164,6 +180,21 @@
       </div>
       <div class="body"><h3>App de Gestión</h3><p>Tablero del negocio: ventas del día, KPIs, gráfico semanal, más vendidos, stock bajo y últimas ventas.</p><span class="go">Abrir gestión →</span></div>
     </a>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="pay">
+    <div class="pblob" style="width:260px;height:260px;right:-70px;top:-80px"></div>
+    <div class="pblob" style="width:170px;height:170px;left:-50px;bottom:-70px"></div>
+    <span class="badge">🔒 Pago verificado · Mercado Pago</span>
+    <h2>Cobro automático y verificado en caja</h2>
+    <p class="sub">La caja se conecta con <b>Mercado Pago</b>. Cuando el cliente paga por transferencia o QR, el sistema confirma solo que la plata <b>realmente entró</b> a tu cuenta y recién ahí marca la venta como pagada. El cajero no tipea montos ni revisa comprobantes.</p>
+    <div class="payg">
+      <div class="payc"><div class="pi">⚡</div><h4>Acreditación automática</h4><p>La venta se marca paga sola cuando el dinero ingresa. Sin esperas ni dudas en el mostrador.</p></div>
+      <div class="payc"><div class="pi">🛡️</div><h4>Adiós comprobantes truchos</h4><p>No se cierra la venta hasta que Mercado Pago confirma. Cero estafas con transferencias falsas o capturas editadas.</p></div>
+      <div class="payc"><div class="pi">🎯</div><h4>Sin errores de monto</h4><p>El importe exacto viaja al QR o link de pago. El cajero no puede equivocarse al cobrar.</p></div>
+    </div>
   </div>
 </section>
 
