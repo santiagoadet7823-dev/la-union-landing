@@ -85,10 +85,13 @@
   .pcardb li:first-child{border-top:0}
   .tick{flex:none;width:20px;height:20px;border-radius:50%;background:#EAF5EE;display:flex;align-items:center;justify-content:center;margin-top:1px}
   .road{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:8px}
-  .ritem{display:flex;gap:14px;background:#fff;border:1px solid #E6E3DD;border-radius:14px;padding:18px}
-  .rnum{flex:none;width:30px;height:30px;border-radius:9px;background:#FBECEE;color:#E0202E;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
-  .ritem h4{font-size:.98rem;margin-bottom:3px}
-  .ritem p{font-size:.85rem;color:#696D77}
+  .ritem{display:flex;flex-direction:column;gap:9px;background:#fff;border:1px solid #E6E3DD;border-radius:16px;padding:20px;transition:transform .15s,box-shadow .15s}
+  .ritem:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(23,24,28,.10)}
+  .rtop{display:flex;align-items:center;justify-content:space-between}
+  .ricon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:21px}
+  .rtag{display:inline-flex;align-items:center;gap:5px;background:#EAF5EE;color:#1B8A53;font-size:11px;font-weight:700;padding:5px 11px;border-radius:999px;letter-spacing:.02em}
+  .ritem h4{font-size:1.02rem;margin-bottom:2px}
+  .ritem p{font-size:.86rem;color:#696D77}
   footer{padding:30px 0 50px;text-align:center;color:#9A9DA4;font-size:13px}
   footer a{color:#696D77;font-weight:600}
   @media(max-width:880px){.demos{grid-template-columns:1fr}.feat{grid-template-columns:repeat(2,1fr)}.contact{flex-direction:column;text-align:center}.contact .actions{margin:0 auto}.stock3{grid-template-columns:1fr}.two{grid-template-columns:1fr}.road{grid-template-columns:1fr}.farrow{transform:rotate(90deg)}}
@@ -215,14 +218,14 @@
 <section class="wrap">
   <div class="section-h"><div><h2>Características extras</h2></div><p>Funcionalidades adicionales que potencian el negocio</p></div>
   <div class="road">
-    <div class="ritem"><div class="rnum">1</div><div><h4>Reposición automática sugerida</h4><p>Cuando la góndola baja del mínimo, el sistema arma solo la lista de lo que hay que bajar del depósito — y el pedido a la distribuidora si el depósito también está corto.</p></div></div>
-    <div class="ritem"><div class="rnum">2</div><div><h4>Lector de código de barras y balanza</h4><p>Cargar y cobrar productos escaneando, y pesar frutas/verduras/fiambres integrado a la caja.</p></div></div>
-    <div class="ritem"><div class="rnum">3</div><div><h4>Cuenta corriente de distribuidora</h4><p>Clientes mayoristas con saldo, pedidos, remitos y lista de precios propia. Pedidos por WhatsApp.</p></div></div>
-    <div class="ritem"><div class="rnum">4</div><div><h4>Control de vencimientos y lotes</h4><p>Avisos de productos próximos a vencer para rotarlos o rematarlos antes de perderlos.</p></div></div>
-    <div class="ritem"><div class="rnum">5</div><div><h4>Facturación electrónica (AFIP)</h4><p>Emitir factura/ticket fiscal directo desde la caja, sin doble carga.</p></div></div>
-    <div class="ritem"><div class="rnum">6</div><div><h4>Multisucursal y acceso remoto</h4><p>Ver ventas y stock de cada local desde el celular, con datos respaldados en la nube.</p></div></div>
-    <div class="ritem"><div class="rnum">7</div><div><h4>Promos y Club con puntos</h4><p>Cupones, 2x1 y puntos por compra para fidelizar, todo atado al cliente.</p></div></div>
-    <div class="ritem"><div class="rnum">8</div><div><h4>Cambio de precios masivo</h4><p>Subir un % a toda una categoría o proveedor de una vez, con vista previa antes de aplicar.</p></div></div>
+    <div class="ritem"><div class="rtop"><div class="ricon" style="background:#FBECEE">🔄</div><span class="rtag">✓ Incluible</span></div><h4>Reposición automática sugerida</h4><p>Cuando la góndola baja del mínimo, el sistema arma solo la lista de lo que hay que bajar del depósito — y el pedido a la distribuidora si el depósito también está corto.</p></div>
+    <div class="ritem"><div class="rtop"><div class="ricon" style="background:#E9F1FE">📷</div><span class="rtag">✓ Incluible</span></div><h4>Lector de código de barras y balanza</h4><p>Cargar y cobrar productos escaneando, y pesar frutas/verduras/fiambres integrado a la caja.</p></div>
+    <div class="ritem"><div class="rtop"><div class="ricon" style="background:#FBECEE">🧾</div><span class="rtag">✓ Incluible</span></div><h4>Cuenta corriente de distribuidora</h4><p>Clientes mayoristas con saldo, pedidos, remitos y lista de precios propia. Pedidos por WhatsApp.</p></div>
+    <div class="ritem"><div class="rtop"><div class="ricon" style="background:#FFF6E6">📅</div><span class="rtag">✓ Incluible</span></div><h4>Control de vencimientos y lotes</h4><p>Avisos de productos próximos a vencer para rotarlos o rematarlos antes de perderlos.</p></div>
+    <div class="ritem"><div class="rtop"><div class="ricon" style="background:#E5F4F4">📠</div><span class="rtag">✓ Incluible</span></div><h4>Facturación electrónica (AFIP)</h4><p>Emitir factura/ticket fiscal directo desde la caja, sin doble carga.</p></div>
+    <div class="ritem"><div class="rtop"><div class="ricon" style="background:#EDEDFB">🏪</div><span class="rtag">✓ Incluible</span></div><h4>Multisucursal y acceso remoto</h4><p>Ver ventas y stock de cada local desde el celular, con datos respaldados en la nube.</p></div>
+    <div class="ritem"><div class="rtop"><div class="ricon" style="background:#FFF6DB">⭐</div><span class="rtag">✓ Incluible</span></div><h4>Promos y Club con puntos</h4><p>Cupones, 2x1 y puntos por compra para fidelizar, todo atado al cliente.</p></div>
+    <div class="ritem"><div class="rtop"><div class="ricon" style="background:#EAF5EE">🏷️</div><span class="rtag">✓ Incluible</span></div><h4>Cambio de precios masivo</h4><p>Subir un % a toda una categoría o proveedor de una vez, con vista previa antes de aplicar.</p></div>
   </div>
 </section>
 
